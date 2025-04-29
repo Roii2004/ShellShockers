@@ -7,7 +7,4 @@ public class SO_Projectiles : ScriptableObject
     public string projectileName;
     
     //[Header("Ballistics")]
-    
-
-
 }

@@ -10,7 +10,13 @@ public class SO_ArtilleryLauncher : ScriptableObject
     public float muzzleVelocity;
 
     [Header("Setting")] 
-    public float maxTilt;
     public float tiltSpeed;
-    public Transform tiltPivot;
+    
+    [Header("Vertical Tilt Limits")]
+    [Range(-90f, 90f)] public float minVerticalTilt = 0f;
+    [Range(-90f, 90f)] public float maxVerticalTilt = 60f;
+
+    [Header("Horizontal Tilt Limits")]
+    [Range(-180f, 180f)] public float minHorizontalTilt = -30f;
+    [Range(-180f, 180f)] public float maxHorizontalTilt = 30f;
 }
