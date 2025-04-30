@@ -6,5 +6,6 @@ public class SO_Projectiles : ScriptableObject
     [Header("Basic Info")]
     public string projectileName;
     
-    //[Header("Ballistics")]
+    [Header("VFX")]
+    public GameObject onImpactEffect;
 }

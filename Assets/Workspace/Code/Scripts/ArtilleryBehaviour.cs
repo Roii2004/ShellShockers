@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.Serialization;
 
 public class ArtilleryBehaviour : MonoBehaviour
@@ -14,6 +15,10 @@ public class ArtilleryBehaviour : MonoBehaviour
     public GameObject shellPrefab;
     public Transform firePoint;
     
+    [Header("Trajectory Preview")]
+    public LineRenderer trajectoryLine;
+    public int resolution = 30;  // Number of points in the arc
+    public float maxSimTime = 5f;  // Max time to simulate
     private float timeSinceLastShot = 0f;
     private float fireCooldown;
 
@@ -32,6 +37,17 @@ public class ArtilleryBehaviour : MonoBehaviour
         {
             TryFire();
         }
+
+        if (Input.GetKey(KeyCode.E))
+        {
+            DrawTrajectory();
+        }
+        else
+        {
+            // Clear the arc when E is not held
+            trajectoryLine.positionCount = 0;
+        }
+
     }
 
     private void PivotRotation()
@@ -90,5 +106,37 @@ public class ArtilleryBehaviour : MonoBehaviour
     {
         if (angle > 180f) angle -= 360f;
         return angle;
+    }
+    
+    private void DrawTrajectory()
+    {
+        if (!trajectoryLine || !firePoint) return;
+
+        List<Vector3> points = new List<Vector3>();
+    
+        Vector3 startPos = firePoint.position;
+        Vector3 startVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
+
+        Vector3 previousPoint = startPos;
+        points.Add(previousPoint);
+
+        for (int i = 1; i < resolution; i++)
+        {
+            float t = (i / (float)(resolution - 1)) * maxSimTime;
+            Vector3 currentPoint = startPos + startVelocity * t + 0.5f * Physics.gravity * t * t;
+
+            // Raycast from previous point to current point
+            if (Physics.Raycast(previousPoint, currentPoint - previousPoint, out RaycastHit hit, Vector3.Distance(previousPoint, currentPoint)))
+            {
+                points.Add(hit.point);  // Stop at collision point
+                break;
+            }
+
+            points.Add(currentPoint);
+            previousPoint = currentPoint;
+        }
+
+        trajectoryLine.positionCount = points.Count;
+        trajectoryLine.SetPositions(points.ToArray());
     }
 }

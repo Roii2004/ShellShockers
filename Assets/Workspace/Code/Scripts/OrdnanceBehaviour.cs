@@ -7,7 +7,9 @@ public class OrdnanceBehaviour : MonoBehaviour
     public SO_Projectiles ordnanceData;
 
     private void OnTriggerEnter(Collider other)
-    {
-        print(other.gameObject.name);
+    {   
+        Destroy(gameObject);
+        GameObject aux = Instantiate(ordnanceData.onImpactEffect,gameObject.transform.position,Quaternion.identity);
+        
     }
 }
