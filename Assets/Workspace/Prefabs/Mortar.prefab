@@ -282,7 +282,7 @@ MonoBehaviour:
   firePoint: {fileID: 7957460811076981487}
   trajectoryLine: {fileID: 7201434868137551751}
   resolution: 30
-  maxSimTime: 10
+  maxSimTime: 50
 --- !u!1 &4244006133666900243
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,7 +330,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2288588497466066832
 Transform:
   m_ObjectHideFlags: 0

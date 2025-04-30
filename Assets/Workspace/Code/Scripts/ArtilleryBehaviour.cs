@@ -19,12 +19,15 @@ public class ArtilleryBehaviour : MonoBehaviour
     public LineRenderer trajectoryLine;
     public int resolution = 30;  // Number of points in the arc
     public float maxSimTime = 5f;  // Max time to simulate
+    
+    
     private float timeSinceLastShot = 0f;
     private float fireCooldown;
 
     void Start()
     {
         fireCooldown = 60f / artilleryLauncher.roundsPerMinute;
+        trajectoryLine.enabled = true;
     }
 
     void Update()
@@ -33,6 +36,11 @@ public class ArtilleryBehaviour : MonoBehaviour
 
         PivotRotation();
 
+        InputActions();
+    }
+
+    private void InputActions()
+    {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             TryFire();
@@ -47,7 +55,6 @@ public class ArtilleryBehaviour : MonoBehaviour
             // Clear the arc when E is not held
             trajectoryLine.positionCount = 0;
         }
-
     }
 
     private void PivotRotation()

@@ -152,3 +152,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ordnanceData: {fileID: 11400000, guid: 72fc7f5dfb09d3e419445d6185648c1d, type: 2}
+  verticalOffset: 5
