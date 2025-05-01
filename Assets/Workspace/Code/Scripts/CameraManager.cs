@@ -2,9 +2,9 @@ using UnityEngine;
 using Unity.Cinemachine;
 public class CameraManager : MonoBehaviour
 {
+    [Header("Camera Settings")]
     public CinemachineCamera projectileCam;
-    public float postImpactDuration = 2f;
-
+    
     private bool isFollowing = false;
     private GameObject toFollowProjectile;
 
@@ -20,13 +20,18 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.F) && toFollowProjectile != null)
+        InputConsequences();
+    }
+
+    private void InputConsequences()
+    {
+        if (/*Input.GetKey(KeyCode.F) && */toFollowProjectile != null)
         {
             FollowProjectile(toFollowProjectile.transform);
         }
         else
         {
-           StopFollowProjectile();
+            StopFollowProjectile();
         }
     }
 
