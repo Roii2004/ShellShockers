@@ -5,6 +5,7 @@ public class SO_ArtilleryLauncher : ScriptableObject
 {
     [Header("Basic Info")]
     public string artilleryName;
+    
     [Header("Firepower")]
     public float roundsPerMinute;
     public float muzzleVelocity;

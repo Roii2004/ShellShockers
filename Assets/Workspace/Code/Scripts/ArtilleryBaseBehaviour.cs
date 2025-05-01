@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
 
-public class ArtilleryBehaviour : MonoBehaviour
+public class ArtilleryBaseBehaviour : MonoBehaviour
 {
     [Header("Scriptable Object")]
     public SO_ArtilleryLauncher artilleryLauncher;
@@ -23,6 +24,8 @@ public class ArtilleryBehaviour : MonoBehaviour
     
     private float timeSinceLastShot = 0f;
     private float fireCooldown;
+    
+    public static Action<GameObject> GetCurrentProjectile;
 
     void Start()
     {
@@ -91,6 +94,7 @@ public class ArtilleryBehaviour : MonoBehaviour
                 if (rb != null)
                 {
                     rb.linearVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
+                    GetCurrentProjectile?.Invoke(shell);
                     Debug.Log("Shell launched!");
                 }
                 else
