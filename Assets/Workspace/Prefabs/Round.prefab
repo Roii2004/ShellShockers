@@ -151,9 +151,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 290f0564c6362e34f844ac9919a5d5a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 1
-  detectionDistance: 20
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 64
-  earlyCameraTriggerSeconds: 2
+  projectileSettings: {fileID: 11400000, guid: 72fc7f5dfb09d3e419445d6185648c1d, type: 2}

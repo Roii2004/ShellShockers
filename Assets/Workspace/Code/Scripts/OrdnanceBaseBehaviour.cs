@@ -6,7 +6,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     [Header("SO Settings")] 
     public SO_Projectiles projectileSettings;
 
-    public static Action<Vector3> OnOrdnanceTriggered;
+    public static Action<Vector3,Rigidbody> OnOrdnanceTriggered;
 
     private Rigidbody rb;
     private bool hasTriggeredCamera = false;
@@ -36,7 +36,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
             Vector3 impactPosition = hit.point;
 
             Debug.Log("Upcoming collision detected. Triggering explosion camera early at " + impactPosition);
-            OnOrdnanceTriggered?.Invoke(impactPosition);
+            OnOrdnanceTriggered?.Invoke(impactPosition,rb);
         }
     }
 
