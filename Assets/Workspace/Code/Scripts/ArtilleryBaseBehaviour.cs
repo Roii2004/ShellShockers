@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 
 public class ArtilleryBaseBehaviour : MonoBehaviour
 {
@@ -94,7 +93,9 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
                 if (rb != null)
                 {
                     rb.linearVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
-                    GetCurrentProjectile?.Invoke(shell);
+                    
+                    GetCurrentProjectile?.Invoke(shell); //Send GO reference to whoever needs it through static Action
+                    
                     Debug.Log("Shell launched!");
                 }
                 else

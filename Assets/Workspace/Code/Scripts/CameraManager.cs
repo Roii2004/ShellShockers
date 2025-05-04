@@ -1,21 +1,27 @@
 using UnityEngine;
 using Unity.Cinemachine;
+using System.Collections;
+
 public class CameraManager : MonoBehaviour
 {
     [Header("Camera Settings")]
     public CinemachineCamera projectileCam;
+    public CinemachineCamera explosionCam;
+    public float explosionCamDuration = 3f;  // duration of the isometric view
     
-    private bool isFollowing = false;
+    private bool isFollowing;
     private GameObject toFollowProjectile;
 
     private void OnEnable()
     {
         ArtilleryBaseBehaviour.GetCurrentProjectile += GetProjectile;
+        OrdnanceBaseBehaviour.OnOrdnanceTriggered += ExplosionCameraTrigger;
     }
 
     private void OnDisable()
     {
         ArtilleryBaseBehaviour.GetCurrentProjectile -= GetProjectile;
+        OrdnanceBaseBehaviour.OnOrdnanceTriggered -= ExplosionCameraTrigger;
     }
 
     void Update()
@@ -53,5 +59,31 @@ public class CameraManager : MonoBehaviour
     public void GetProjectile(GameObject projectile)
     {
         toFollowProjectile = projectile;
+    }
+
+    public void ExplosionCameraTrigger(Vector3 explosionPosition)
+    {
+        explosionCam.Priority = 30;
+        projectileCam.Priority = 10;
+
+        explosionCam.transform.position = explosionPosition + new Vector3(0, 20, -20);
+        explosionCam.transform.LookAt(explosionPosition);
+
+        explosionCam.enabled = true;
+        projectileCam.enabled = false;
+
+
+        StartCoroutine(DisableExplosionCamAfterDelay());
+    }
+
+    private IEnumerator DisableExplosionCamAfterDelay()
+    {
+        yield return new WaitForSeconds(explosionCamDuration);
+
+        explosionCam.Priority = 0;
+        explosionCam.enabled = false;
+
+        projectileCam.Priority = 20;
+        projectileCam.enabled = true;
     }
 }
