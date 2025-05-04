@@ -8,10 +8,11 @@ public class SO_Projectiles : ScriptableObject
 
     [Header("VFX")]
     public GameObject onImpactEffect;
+    public float spinSpeed = 720f; 
+
 
     [Header("Explosion Detection")]
     public float detectionRadius = 1f;
-    public float detectionDistance = 20f;
     public float earlyCameraTriggerSeconds = 2f;
     public LayerMask collisionMask;
 }

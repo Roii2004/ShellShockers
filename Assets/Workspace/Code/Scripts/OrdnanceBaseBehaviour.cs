@@ -1,13 +1,17 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 [RequireComponent(typeof(Rigidbody))]
 public class OrdnanceBaseBehaviour : MonoBehaviour
 {
     [Header("SO Settings")] 
     public SO_Projectiles projectileSettings;
+    
+    [Header("VFX Logic Settings (Place visual model GO)")] 
+    public Transform visualModelTransform;  
 
     public static Action<Vector3,Rigidbody> OnOrdnanceTriggered;
-
     private Rigidbody rb;
     private bool hasTriggeredCamera = false;
 
@@ -19,6 +23,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     void Update()
     {
         DetectUpcomingCollision();
+        VFXLogic();
     }
 
     private void DetectUpcomingCollision()
@@ -39,12 +44,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
             OnOrdnanceTriggered?.Invoke(impactPosition,rb);
         }
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Explode();
-    }
-
+    
     private void Explode()
     {
         if (projectileSettings != null && projectileSettings.onImpactEffect != null)
@@ -55,5 +55,15 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
 
         Debug.Log("Shell exploded");
         Destroy(gameObject);
+    }
+
+    private void VFXLogic()
+    {
+        visualModelTransform.Rotate(Vector3.forward, projectileSettings.spinSpeed * Time.deltaTime, Space.Self);
+    }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        Explode();
     }
 }
