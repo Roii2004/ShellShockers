@@ -15,8 +15,10 @@ MonoBehaviour:
   projectileName: Round
   onImpactEffect: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
   spinSpeed: 720
+  tiltSpeed: 5
+  modelRotationOffset: {x: -90, y: 0, z: 0}
   detectionRadius: 1
-  earlyCameraTriggerSeconds: 2
+  earlyCameraTriggerSeconds: 1
   collisionMask:
     serializedVersion: 2
     m_Bits: 64

@@ -70,23 +70,11 @@ public class CameraManager : MonoBehaviour
 
     public void ExplosionCameraTrigger(Vector3 explosionPosition,Rigidbody rb)
     {
-        // explosionCam.Priority = 30;
-        // projectileCam.Priority = 10;
-        //
-        // explosionCam.transform.position = explosionPosition + new Vector3(0, 40, -40);
-        // explosionCam.transform.LookAt(explosionPosition);
-        //
-        // explosionCam.enabled = true;
-        // projectileCam.enabled = false;
-        //
-        //
-        // StartCoroutine(DisableExplosionCamAfterDelay());
-        
         explosionCam.Priority = 30;
         projectileCam.Priority = 10;
 
         // Dynamic isometric offset based on projectile's approach direction
-        Vector3 incomingDirection = -rb.linearVelocity.normalized;  // needs access to Rigidbody
+        Vector3 incomingDirection = -rb.linearVelocity.normalized;  
         Vector3 offset = incomingDirection * 30f + Vector3.up * 20f;
 
         explosionCam.transform.position = explosionPosition + offset;

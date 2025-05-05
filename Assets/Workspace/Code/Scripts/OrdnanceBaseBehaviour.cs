@@ -18,6 +18,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 
     void Update()
@@ -40,7 +41,6 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
             hasTriggeredCamera = true;
             Vector3 impactPosition = hit.point;
 
-            Debug.Log("Upcoming collision detected. Triggering explosion camera early at " + impactPosition);
             OnOrdnanceTriggered?.Invoke(impactPosition,rb);
         }
     }
@@ -53,13 +53,26 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
                 transform.position, Quaternion.identity);
         }
 
-        Debug.Log("Shell exploded");
         Destroy(gameObject);
     }
 
     private void VFXLogic()
     {
-        visualModelTransform.Rotate(Vector3.forward, projectileSettings.spinSpeed * Time.deltaTime, Space.Self);
+        visualModelTransform.Rotate(Vector3.up, projectileSettings.spinSpeed * Time.deltaTime, Space.Self);
+
+        if (rb.linearVelocity.sqrMagnitude > 0.01f)
+        {
+            Vector3 velocityDirection = rb.linearVelocity.normalized;
+
+            Vector3 rotationAxis = Vector3.Cross(Vector3.up, velocityDirection);  
+            float angle = Vector3.Angle(Vector3.up, velocityDirection);  
+
+            Quaternion targetRotation = Quaternion.AngleAxis(angle, rotationAxis);
+            visualModelTransform.rotation = Quaternion.Slerp(visualModelTransform.rotation, targetRotation, Time.deltaTime * projectileSettings.tiltSpeed);
+
+            Quaternion modelCorrection = Quaternion.Euler(projectileSettings.modelRotationOffset);
+            visualModelTransform.rotation = Quaternion.LookRotation(velocityDirection) * modelCorrection;
+        }
     }
     
     private void OnTriggerEnter(Collider other)

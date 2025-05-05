@@ -8,8 +8,9 @@ public class SO_Projectiles : ScriptableObject
 
     [Header("VFX")]
     public GameObject onImpactEffect;
-    public float spinSpeed = 720f; 
-
+    public float spinSpeed = 360f;
+    public float tiltSpeed = 5f;
+    public Vector3 modelRotationOffset = new Vector3(-90, 0, 0); // or whatever is needed
 
     [Header("Explosion Detection")]
     public float detectionRadius = 1f;

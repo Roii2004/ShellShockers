@@ -50,6 +50,7 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
 
         if (Input.GetKey(KeyCode.E))
         {
+            
             DrawTrajectory();
         }
         else
