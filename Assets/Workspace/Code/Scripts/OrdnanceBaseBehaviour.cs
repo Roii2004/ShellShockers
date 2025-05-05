@@ -11,7 +11,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     [Header("VFX Logic Settings (Place visual model GO)")] 
     public Transform visualModelTransform;  
 
-    public static Action<Vector3,Rigidbody> OnOrdnanceTriggered;
+    public static Action<Vector3,Rigidbody> onExplosionDetectionTriggered;
     private Rigidbody rb;
     private bool hasTriggeredCamera = false;
 
@@ -41,7 +41,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
             hasTriggeredCamera = true;
             Vector3 impactPosition = hit.point;
 
-            OnOrdnanceTriggered?.Invoke(impactPosition,rb);
+            onExplosionDetectionTriggered?.Invoke(impactPosition,rb);
         }
     }
     

@@ -16,13 +16,13 @@ public class CameraManager : MonoBehaviour
     private void OnEnable()
     {
         ArtilleryBaseBehaviour.GetCurrentProjectile += GetProjectile;
-        OrdnanceBaseBehaviour.OnOrdnanceTriggered += ExplosionCameraTrigger;
+        OrdnanceBaseBehaviour.onExplosionDetectionTriggered += ExplosionCameraTrigger;
     }
 
     private void OnDisable()
     {
         ArtilleryBaseBehaviour.GetCurrentProjectile -= GetProjectile;
-        OrdnanceBaseBehaviour.OnOrdnanceTriggered -= ExplosionCameraTrigger;
+        OrdnanceBaseBehaviour.onExplosionDetectionTriggered -= ExplosionCameraTrigger;
     }
 
     private void Start()
