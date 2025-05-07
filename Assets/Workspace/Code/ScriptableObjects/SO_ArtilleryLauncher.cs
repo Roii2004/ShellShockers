@@ -9,7 +9,8 @@ public class SO_ArtilleryLauncher : ScriptableObject
     [Header("Firepower")]
     public float roundsPerMinute;
     public float muzzleVelocity;
-
+    public float recoilAmount = 2f;
+    
     [Header("Setting")] 
     public float tiltSpeed;
     

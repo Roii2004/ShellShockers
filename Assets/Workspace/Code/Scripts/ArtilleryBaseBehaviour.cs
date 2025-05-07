@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public class ArtilleryBaseBehaviour : MonoBehaviour
 {
@@ -94,9 +95,11 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
                 if (rb != null)
                 {
                     rb.linearVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
-                    
-                    GetCurrentProjectile?.Invoke(shell); //Send GO reference to whoever needs it through static Action
-                    
+
+                    GetCurrentProjectile?.Invoke(shell);
+
+                    ApplyRecoil(); 
+
                     Debug.Log("Shell launched!");
                 }
                 else
@@ -113,6 +116,21 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
         {
             Debug.Log("Still reloading...");
         }
+    }
+    
+    private void ApplyRecoil()
+    {
+        // Vertical tilt recoil
+        float currentX = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
+        float recoilX = currentX + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        recoilX = Mathf.Clamp(recoilX, artilleryLauncher.minVerticalTilt, artilleryLauncher.maxVerticalTilt);
+        verticalPivotPoint.localRotation = Quaternion.Euler(recoilX, 0f, 0f);
+
+        // Horizontal tilt recoil
+        float currentY = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
+        float recoilY = currentY + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        recoilY = Mathf.Clamp(recoilY, artilleryLauncher.minHorizontalTilt, artilleryLauncher.maxHorizontalTilt);
+        horizontalPivotPoint.localRotation = Quaternion.Euler(0f, recoilY, 0f);
     }
     
     private float NormalizeAngle(float angle)
@@ -152,4 +170,5 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
         trajectoryLine.positionCount = points.Count;
         trajectoryLine.SetPositions(points.ToArray());
     }
+    
 }
