@@ -1,13 +1,11 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
 
-public class ArtilleryBaseBehaviour : MonoBehaviour
+public abstract class ArtilleryBaseBehaviour : MonoBehaviour
 {
     [Header("Scriptable Object")]
     public SO_ArtilleryLauncher artilleryLauncher;
-    
+
     [Header("Pivot Points")]
     public Transform verticalPivotPoint;    // Tilts up/down (pitch)
     public Transform horizontalPivotPoint;  // Rotates left/right (yaw)
@@ -16,56 +14,23 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
     public GameObject shellPrefab;
     public Transform firePoint;
     
-    [Header("Trajectory Preview")]
-    public LineRenderer trajectoryLine;
-    public int resolution = 30;  // Number of points in the arc
-    public float maxSimTime = 5f;  // Max time to simulate
-    
-    
-    private float timeSinceLastShot = 0f;
-    private float fireCooldown;
-    
-    public static Action<GameObject> GetCurrentProjectile;
 
-    void Start()
+    protected float timeSinceLastShot = 0f;
+    protected float fireCooldown;
+
+
+    protected virtual void Start()
     {
         fireCooldown = 60f / artilleryLauncher.roundsPerMinute;
-        trajectoryLine.enabled = true;
     }
 
-    void Update()
+    protected virtual void Update()
     {
         timeSinceLastShot += Time.deltaTime;
-
-        PivotRotation();
-
-        InputActions();
     }
 
-    private void InputActions()
+    protected void PivotRotation(float horizontalInput, float verticalInput)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            TryFire();
-        }
-
-        if (Input.GetKey(KeyCode.E))
-        {
-            
-            DrawTrajectory();
-        }
-        else
-        {
-            // Clear the arc when E is not held
-            trajectoryLine.positionCount = 0;
-        }
-    }
-
-    private void PivotRotation()
-    {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-
         // Vertical tilt (elevation)
         float currentX = verticalPivotPoint.localEulerAngles.x;
         currentX = NormalizeAngle(currentX);
@@ -81,7 +46,7 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
         horizontalPivotPoint.localRotation = Quaternion.Euler(0f, newY, 0f);
     }
 
-    private void TryFire()
+    protected virtual void TryFire()
     {
         if (timeSinceLastShot >= fireCooldown)
         {
@@ -96,9 +61,9 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
                 {
                     rb.linearVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
 
-                    GetCurrentProjectile?.Invoke(shell);
+                    //GetCurrentProjectile?.Invoke(shell);
 
-                    ApplyRecoil(); 
+                    ApplyRecoil();
 
                     Debug.Log("Shell launched!");
                 }
@@ -117,58 +82,25 @@ public class ArtilleryBaseBehaviour : MonoBehaviour
             Debug.Log("Still reloading...");
         }
     }
-    
-    private void ApplyRecoil()
+
+    protected void ApplyRecoil()
     {
         // Vertical tilt recoil
         float currentX = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
-        float recoilX = currentX + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        float recoilX = currentX + UnityEngine.Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
         recoilX = Mathf.Clamp(recoilX, artilleryLauncher.minVerticalTilt, artilleryLauncher.maxVerticalTilt);
         verticalPivotPoint.localRotation = Quaternion.Euler(recoilX, 0f, 0f);
 
         // Horizontal tilt recoil
         float currentY = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
-        float recoilY = currentY + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        float recoilY = currentY + UnityEngine.Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
         recoilY = Mathf.Clamp(recoilY, artilleryLauncher.minHorizontalTilt, artilleryLauncher.maxHorizontalTilt);
         horizontalPivotPoint.localRotation = Quaternion.Euler(0f, recoilY, 0f);
     }
-    
-    private float NormalizeAngle(float angle)
+
+    protected float NormalizeAngle(float angle)
     {
         if (angle > 180f) angle -= 360f;
         return angle;
     }
-    
-    private void DrawTrajectory()
-    {
-        if (!trajectoryLine || !firePoint) return;
-
-        List<Vector3> points = new List<Vector3>();
-    
-        Vector3 startPos = firePoint.position;
-        Vector3 startVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
-
-        Vector3 previousPoint = startPos;
-        points.Add(previousPoint);
-
-        for (int i = 1; i < resolution; i++)
-        {
-            float t = (i / (float)(resolution - 1)) * maxSimTime;
-            Vector3 currentPoint = startPos + startVelocity * t + 0.5f * Physics.gravity * t * t;
-
-            // Raycast from previous point to current point
-            if (Physics.Raycast(previousPoint, currentPoint - previousPoint, out RaycastHit hit, Vector3.Distance(previousPoint, currentPoint)))
-            {
-                points.Add(hit.point);  // Stop at collision point
-                break;
-            }
-
-            points.Add(currentPoint);
-            previousPoint = currentPoint;
-        }
-
-        trajectoryLine.positionCount = points.Count;
-        trajectoryLine.SetPositions(points.ToArray());
-    }
-    
 }

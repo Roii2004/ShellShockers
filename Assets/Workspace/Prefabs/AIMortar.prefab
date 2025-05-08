@@ -238,9 +238,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7217260119126054568}
-  - component: {fileID: 8151350913891263320}
+  - component: {fileID: -8642837213982192945}
   m_Layer: 0
-  m_Name: Mortar
+  m_Name: AIMortar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,7 +263,7 @@ Transform:
   - {fileID: 2288588497466066832}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8151350913891263320
+--- !u!114 &-8642837213982192945
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -272,7 +272,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3606495628398453941}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 454fffb54eeb6f8419ff57f90e8bc032, type: 3}
+  m_Script: {fileID: 11500000, guid: 9fbd22d7b71a1aa40a4a684e2cead131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   artilleryLauncher: {fileID: 11400000, guid: 4d20e3f0a52a0b846b5244086463ad27, type: 2}
@@ -281,8 +281,10 @@ MonoBehaviour:
   shellPrefab: {fileID: 1693071885540023102, guid: 4829db53c21ee1145bbace5a8d438cd0, type: 3}
   firePoint: {fileID: 7957460811076981487}
   trajectoryLine: {fileID: 7201434868137551751}
-  resolution: 200
-  maxSimTime: 40
+  resolution: 100
+  maxSimTime: 5
+  aiProfile: {fileID: 0}
+  target: {fileID: 0}
 --- !u!1 &4244006133666900243
 GameObject:
   m_ObjectHideFlags: 0

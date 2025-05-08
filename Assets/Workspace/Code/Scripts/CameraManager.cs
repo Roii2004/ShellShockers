@@ -15,13 +15,13 @@ public class CameraManager : MonoBehaviour
 
     private void OnEnable()
     {
-        ArtilleryBaseBehaviour.GetCurrentProjectile += GetProjectile;
+        ArtilleryPlayableBehaviour.GetCurrentProjectile += GetProjectile;
         OrdnanceBaseBehaviour.onExplosionDetectionTriggered += ExplosionCameraTrigger;
     }
 
     private void OnDisable()
     {
-        ArtilleryBaseBehaviour.GetCurrentProjectile -= GetProjectile;
+        ArtilleryPlayableBehaviour.GetCurrentProjectile -= GetProjectile;
         OrdnanceBaseBehaviour.onExplosionDetectionTriggered -= ExplosionCameraTrigger;
     }
 
@@ -70,20 +70,27 @@ public class CameraManager : MonoBehaviour
 
     public void ExplosionCameraTrigger(Vector3 explosionPosition,Rigidbody rb)
     {
-        explosionCam.Priority = 30;
-        projectileCam.Priority = 10;
+        if (toFollowProjectile != null)
+        {
+            explosionCam.Priority = 30;
+            projectileCam.Priority = 10;
 
-        // Dynamic isometric offset based on projectile's approach direction
-        Vector3 incomingDirection = -rb.linearVelocity.normalized;  
-        Vector3 offset = incomingDirection * 30f + Vector3.up * 20f;
+            // Dynamic isometric offset based on projectile's approach direction
+            Vector3 incomingDirection = -rb.linearVelocity.normalized;  
+            Vector3 offset = incomingDirection * 30f + Vector3.up * 20f;
 
-        explosionCam.transform.position = explosionPosition + offset;
-        explosionCam.transform.LookAt(explosionPosition);
+            explosionCam.transform.position = explosionPosition + offset;
+            explosionCam.transform.LookAt(explosionPosition);
 
-        explosionCam.enabled = true;
-        projectileCam.enabled = false;
+            explosionCam.enabled = true;
+            projectileCam.enabled = false;
 
-        StartCoroutine(DisableExplosionCamAfterDelay());
+            StartCoroutine(DisableExplosionCamAfterDelay());   
+        }
+        else
+        {
+            Debug.Log("The round must be fired by playable artillery to be followed");
+        }
     }
 
     private IEnumerator DisableExplosionCamAfterDelay()
