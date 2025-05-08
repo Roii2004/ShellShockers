@@ -146,7 +146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7217260119126054568, guid: 0d8958c2d9cb8a649a6120beeace28e0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.18299
+      value: -58.6
       objectReference: {fileID: 0}
     - target: {fileID: 7217260119126054568, guid: 0d8958c2d9cb8a649a6120beeace28e0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -349,6 +349,11 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+--- !u!4 &524198419 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+  m_PrefabInstance: {fileID: 1585085168}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &657343932
 GameObject:
   m_ObjectHideFlags: 0
@@ -881,6 +886,71 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
+--- !u!1001 &1585085168
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1772386163}
+    m_Modifications:
+    - target: {fileID: -8642837213982192945, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 29796646}
+    - target: {fileID: -8642837213982192945, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: aiProfile
+      value: 
+      objectReference: {fileID: 11400000, guid: 85a7a3aa9fa4b904da9879813f0144ab, type: 2}
+    - target: {fileID: 3606495628398453941, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_Name
+      value: AIMortar
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.2443419
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 39.62249
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217260119126054568, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 87d65040621caee41aec51bcdaa7bc21, type: 3}
 --- !u!1 &1734063925
 GameObject:
   m_ObjectHideFlags: 0
@@ -1036,6 +1106,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 29796646}
+  - {fileID: 524198419}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1873117875

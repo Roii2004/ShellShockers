@@ -1,6 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewArtilleryAIProfile", menuName = "AI/Artillery AI Profile")]
+[CreateAssetMenu(fileName = "SO_ArtilleryLauncher", 
+    menuName = "Scriptable Objects/ArtilleryLauncher/AI/Artillery AI Profile")]
 public class SO_ArtilleryAIProfile : ScriptableObject
 {
     [Range(0f, 1f)]

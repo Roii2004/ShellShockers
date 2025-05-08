@@ -4,14 +4,13 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
 {
     [Header("AI Configuration")]
     public SO_ArtilleryAIProfile aiProfile;
-    public Transform target; // Assign the target transform in the Inspector or via script
+    public Transform target;
 
     private float repositionTimer = 0f;
 
     protected override void Start()
     {
         base.Start();
-        // Initialize AI-specific settings if needed
     }
 
     protected override void Update()
@@ -38,81 +37,93 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
 
     private bool ShouldFire()
     {
-        // Implement logic to decide whether to fire based on aimingAccuracy
         return Random.value <= aiProfile.aimingAccuracy;
     }
 
     private void Reposition()
     {
-        // Implement repositioning logic based on strategyType
         switch (aiProfile.strategyType)
         {
             case AI_StrategyType.Aggressive:
-                // Move closer to the enemy
                 break;
             case AI_StrategyType.Defensive:
-                // Move to a safer location
                 break;
             case AI_StrategyType.Balanced:
-                // Maintain current position or make minor adjustments
                 break;
             case AI_StrategyType.Random:
-                // Move to a random position within certain bounds
                 break;
         }
     }
 
     private void AimAtTarget(Transform target)
     {
+        Vector3 targetPos = target.position;
         Rigidbody targetRb = target.GetComponent<Rigidbody>();
         Vector3 targetVelocity = targetRb != null ? targetRb.linearVelocity : Vector3.zero;
 
-        Vector3 aimPoint = PredictImpactPoint(target.position, targetVelocity, artilleryLauncher.muzzleVelocity, firePoint.position);
+        Vector3 predictedPoint = PredictImpactPoint(targetPos, targetVelocity, artilleryLauncher.muzzleVelocity, firePoint.position);
+        Vector3 toTarget = predictedPoint - firePoint.position;
 
-        Vector3 direction = aimPoint - firePoint.position;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        horizontalPivotPoint.rotation = Quaternion.Euler(0f, lookRotation.eulerAngles.y, 0f);
-        verticalPivotPoint.localRotation = Quaternion.Euler(lookRotation.eulerAngles.x, 0f, 0f);
+        // Compute horizontal rotation
+        Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
+        float yaw = Quaternion.LookRotation(toTargetXZ).eulerAngles.y;
+        horizontalPivotPoint.rotation = Quaternion.Euler(0f, yaw, 0f);
+
+        // Recalculate pitch relative to rotated horizontal pivot
+        float distanceXZ = toTargetXZ.magnitude;
+        float height = toTarget.y;
+        float velocity = artilleryLauncher.muzzleVelocity;
+        float gravity = Mathf.Abs(Physics.gravity.y);
+
+        float angle;
+        if (CalculateLaunchAngle(velocity, distanceXZ, height, gravity, out angle))
+        {
+            float pitch = Mathf.Rad2Deg * angle;
+
+            // Clamp elevation angle
+            pitch = Mathf.Clamp(pitch, 15f, 75f);
+
+            // Apply pitch to vertical pivot in local space
+            verticalPivotPoint.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        }
+        else
+        {
+            verticalPivotPoint.localRotation = Quaternion.Euler(45f, 0f, 0f); // fallback
+        }
+    }
+
+    private bool CalculateLaunchAngle(float velocity, float distanceXZ, float deltaY, float gravity, out float angle)
+    {
+        float v2 = velocity * velocity;
+        float v4 = v2 * v2;
+        float root = v4 - gravity * (gravity * distanceXZ * distanceXZ + 2f * deltaY * v2);
+
+        if (root < 0f)
+        {
+            angle = 0f;
+            return false;
+        }
+
+        float sqrt = Mathf.Sqrt(root);
+        float highAngle = Mathf.Atan((v2 + sqrt) / (gravity * distanceXZ));
+        angle = highAngle;
+        return true;
     }
 
     private Vector3 PredictImpactPoint(Vector3 targetPos, Vector3 targetVelocity, float projectileSpeed, Vector3 shooterPos)
     {
-        Vector3 displacement = targetPos - shooterPos;
-        float targetMoveAngle = Vector3.Angle(-displacement, targetVelocity) * Mathf.Deg2Rad;
+        Vector3 toTarget = targetPos - shooterPos;
+        Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
+        float distance = toTargetXZ.magnitude;
 
-        float targetSpeed = targetVelocity.magnitude;
-        float cosTheta = Mathf.Cos(targetMoveAngle);
-
-        float a = projectileSpeed * projectileSpeed - targetSpeed * targetSpeed;
-        float b = 2f * displacement.magnitude * targetSpeed * cosTheta;
-        float c = -displacement.sqrMagnitude;
-
-        float discriminant = b * b - 4f * a * c;
-
-        if (discriminant < 0f)
-        {
-            // No solution, cannot hit the target with current projectile speed
+        float angle;
+        if (!CalculateLaunchAngle(projectileSpeed, distance, toTarget.y, Mathf.Abs(Physics.gravity.y), out angle))
             return targetPos;
-        }
 
-        float sqrtDiscriminant = Mathf.Sqrt(discriminant);
-        float t1 = (-b + sqrtDiscriminant) / (2f * a);
-        float t2 = (-b - sqrtDiscriminant) / (2f * a);
+        float time = distance / (projectileSpeed * Mathf.Cos(angle));
+        Vector3 predictedPos = targetPos + targetVelocity * time;
 
-        float t = Mathf.Min(t1, t2);
-        if (t < 0f)
-            t = Mathf.Max(t1, t2);
-
-        if (t > 0f)
-        {
-            return targetPos + targetVelocity * t;
-        }
-        else
-        {
-            // No valid time, return current position
-            return targetPos;
-        }
+        return predictedPos;
     }
 }
-
 

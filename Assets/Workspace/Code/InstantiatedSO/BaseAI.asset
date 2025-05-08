@@ -9,15 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ce72e1cd2816214081217f37e240d63, type: 3}
-  m_Name: BaseMortar
+  m_Script: {fileID: 11500000, guid: 36ec642dc7b13d3479771a54264293b1, type: 3}
+  m_Name: BaseAI
   m_EditorClassIdentifier: 
-  artilleryName: Mortar
-  roundsPerMinute: 30
-  muzzleVelocity: 30
-  recoilAmount: 0
-  tiltSpeed: 25
-  minVerticalTilt: 0
-  maxVerticalTilt: 60
-  minHorizontalTilt: -30
-  maxHorizontalTilt: 30
+  aimingAccuracy: 1
+  strategyType: 0
+  fireCooldownMultiplier: 1
+  detectionRadius: 50
+  repositionInterval: 10
