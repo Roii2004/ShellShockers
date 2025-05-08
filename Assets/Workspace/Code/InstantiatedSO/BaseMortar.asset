@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   artilleryName: Mortar
   roundsPerMinute: 30
-  muzzleVelocity: 30
+  muzzleVelocity: 73.7
   recoilAmount: 0
   tiltSpeed: 25
   minVerticalTilt: 0
