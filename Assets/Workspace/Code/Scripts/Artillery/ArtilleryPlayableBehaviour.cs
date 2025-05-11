@@ -61,11 +61,11 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
 
                 if (rb != null)
                 {
-                    rb.linearVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
+                    rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
 
                     GetCurrentProjectile?.Invoke(shell);
 
-                    ApplyRecoil();
+                    //ApplyRecoil();
 
                     Debug.Log("Shell launched!");
                 }
@@ -92,7 +92,7 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
         List<Vector3> points = new List<Vector3>();
 
         Vector3 startPos = firePoint.position;
-        Vector3 startVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
+        Vector3 startVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
 
         Vector3 previousPoint = startPos;
         points.Add(previousPoint);

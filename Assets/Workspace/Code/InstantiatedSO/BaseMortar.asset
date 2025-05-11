@@ -17,7 +17,7 @@ MonoBehaviour:
   muzzleVelocity: 73.7
   recoilAmount: 0
   tiltSpeed: 25
-  minVerticalTilt: 0
-  maxVerticalTilt: 60
-  minHorizontalTilt: -30
-  maxHorizontalTilt: 30
+  minVerticalTilt: -90
+  maxVerticalTilt: 90
+  minHorizontalTilt: -180
+  maxHorizontalTilt: 180

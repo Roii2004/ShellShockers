@@ -59,11 +59,9 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
 
                 if (rb != null)
                 {
-                    rb.linearVelocity = firePoint.up * artilleryLauncher.muzzleVelocity;
+                    rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
 
-                    //GetCurrentProjectile?.Invoke(shell);
-
-                    ApplyRecoil();
+                    //ApplyRecoil();
 
                     Debug.Log("Shell launched!");
                 }
@@ -83,7 +81,7 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
         }
     }
 
-    protected void ApplyRecoil()
+    /*protected void ApplyRecoil()
     {
         // Vertical tilt recoil
         float currentX = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
@@ -96,7 +94,7 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
         float recoilY = currentY + UnityEngine.Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
         recoilY = Mathf.Clamp(recoilY, artilleryLauncher.minHorizontalTilt, artilleryLauncher.maxHorizontalTilt);
         horizontalPivotPoint.localRotation = Quaternion.Euler(0f, recoilY, 0f);
-    }
+    }*/
 
     protected float NormalizeAngle(float angle)
     {
