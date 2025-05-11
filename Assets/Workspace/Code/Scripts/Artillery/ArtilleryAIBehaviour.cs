@@ -8,7 +8,7 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
     public SO_ArtilleryAIProfile aiProfile;
     public Transform target;
 
-    private const float alignmentTolerance = 1f; // degrees
+    private const float alignmentTolerance =1f; // degrees
 
     private void Update()
     {
@@ -34,25 +34,26 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
         if (!CalculateMortarAngles(firePosition, targetPosition, muzzleVelocity, gravity, out float desiredYaw, out float desiredPitch))
             return false; // No valid trajectory
 
-        // Normalize current angles
-        float currentYaw = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
-        float currentPitch = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
+        // Calculate the desired launch direction using yaw + pitch
+        Quaternion yawRot = Quaternion.Euler(0f, desiredYaw, 0f);
+        Quaternion pitchRot = Quaternion.Euler(-desiredPitch, 0f, 0f); // -pitch: Unity pitches down for +X
+        Vector3 desiredLaunchDir = yawRot * pitchRot * Vector3.forward;
 
-        // Calculate angle differences
-        float yawDelta = NormalizeAngle(desiredYaw - currentYaw);
-        float pitchDelta = NormalizeAngle(desiredPitch - currentPitch);
+        // Compare with current direction
+        Vector3 currentDir = firePoint.forward;
+        float angleDiff = Vector3.Angle(currentDir, desiredLaunchDir);
+        Vector3 cross = Vector3.Cross(currentDir, desiredLaunchDir);
 
-        // Scaled rotation input
-        float horizontalInput = Mathf.Clamp(yawDelta / 30f, -1f, 1f);
-        float verticalInput = Mathf.Clamp(pitchDelta / 30f, -1f, 1f);
+        // Use constant input based on sign (no slowdown near target)
+        float horizontalInput = Mathf.Sign(cross.y);   // Y axis = yaw
+        float verticalInput = Mathf.Sign(-cross.x);    // X axis = pitch (negative due to Unity's convention)
 
         PivotRotation(horizontalInput, verticalInput);
 
-        // Check if aligned close enough
-        isAimed = Mathf.Abs(yawDelta) <= alignmentTolerance && Mathf.Abs(pitchDelta) <= alignmentTolerance;
+        // Aim is "close enough" when angle difference is small
+        isAimed = angleDiff <= alignmentTolerance;
         return true;
     }
-
     private bool CalculateMortarAngles(
         Vector3 firePosition,
         Vector3 targetPosition,
@@ -63,11 +64,9 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
     {
         Vector3 toTarget = targetPosition - firePosition;
 
-        // Horizontal distance
+        // Horizontal direction
         Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
         float x = toTargetXZ.magnitude;
-
-        // Vertical offset
         float y = toTarget.y;
 
         float v = muzzleVelocity;
@@ -78,22 +77,60 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
         {
             requiredYaw = 0f;
             requiredPitchHigh = 0f;
-            return false; // No solution
+            return false; // No valid firing arc
         }
 
         float sqrtDiscriminant = Mathf.Sqrt(discriminant);
-
-        float angleLow = Mathf.Atan((v2 - sqrtDiscriminant) / (gravity * x));
         float angleHigh = Mathf.Atan((v2 + sqrtDiscriminant) / (gravity * x));
-        requiredPitchHigh = angleHigh * Mathf.Rad2Deg; // Force mortar-style high arc
+        requiredPitchHigh = angleHigh * Mathf.Rad2Deg;
 
-        // Horizontal yaw angle
-        Vector3 flatDir = toTargetXZ.normalized;
-        requiredYaw = Mathf.Atan2(flatDir.x, flatDir.z) * Mathf.Rad2Deg;
+        // Convert world-space direction to mortar's local yaw
+        Vector3 flatDirection = toTargetXZ.normalized;
+        requiredYaw = Mathf.Atan2(flatDirection.x, flatDirection.z) * Mathf.Rad2Deg;
 
         return true;
     }
+    private void OnDrawGizmosSelected()
+    {
+        if (firePoint != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(firePoint.position, firePoint.forward * 5f); // Shows current fire direction
 
+            if (target != null)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(firePoint.position, target.position); // Target line
+
+                // Draw desired ballistic arc (optional)
+                Vector3 firePos = firePoint.position;
+                Vector3 targetPos = target.position;
+                float v = artilleryLauncher != null ? artilleryLauncher.muzzleVelocity : 10f;
+                float g = Mathf.Abs(Physics.gravity.y);
+
+                if (CalculateMortarAngles(firePos, targetPos, v, g, out float yaw, out float pitch))
+                {
+                    // Simulate a parabolic arc using physics steps
+                    Vector3 dir = (targetPos - firePos).normalized;
+                    Quaternion yawRot = Quaternion.Euler(0f, yaw, 0f);
+                    Quaternion pitchRot = Quaternion.Euler(-pitch, 0f, 0f); // NEGATIVE because Unity pitches down by +X
+
+                    Vector3 launchDir = yawRot * pitchRot * Vector3.forward;
+                    Vector3 velocity = launchDir * v;
+
+                    Gizmos.color = Color.cyan;
+                    Vector3 pos = firePos;
+                    for (float t = 0; t < 30f; t += 0.05f)
+                    {
+                        Vector3 next = pos + velocity * 0.1f + 0.5f * Physics.gravity * 0.1f * 0.1f;
+                        Gizmos.DrawLine(pos, next);
+                        velocity += Physics.gravity * 0.1f;
+                        pos = next;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
