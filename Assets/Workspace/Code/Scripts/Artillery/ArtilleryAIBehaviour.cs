@@ -1,14 +1,13 @@
-using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using System.Collections;
 
 public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
 {
-   [Header("AI Settings")]
+    [Header("AI Settings")]
     public SO_ArtilleryAIProfile aiProfile;
     public Transform target;
 
-    private const float alignmentTolerance =1f; // degrees
+    private const float alignmentTolerance = 1f; // degrees
 
     private void Update()
     {
@@ -34,26 +33,23 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
         if (!CalculateMortarAngles(firePosition, targetPosition, muzzleVelocity, gravity, out float desiredYaw, out float desiredPitch))
             return false; // No valid trajectory
 
-        // Calculate the desired launch direction using yaw + pitch
         Quaternion yawRot = Quaternion.Euler(0f, desiredYaw, 0f);
         Quaternion pitchRot = Quaternion.Euler(-desiredPitch, 0f, 0f); // -pitch: Unity pitches down for +X
         Vector3 desiredLaunchDir = yawRot * pitchRot * Vector3.forward;
 
-        // Compare with current direction
         Vector3 currentDir = firePoint.forward;
         float angleDiff = Vector3.Angle(currentDir, desiredLaunchDir);
         Vector3 cross = Vector3.Cross(currentDir, desiredLaunchDir);
 
-        // Use constant input based on sign (no slowdown near target)
         float horizontalInput = Mathf.Sign(cross.y);   // Y axis = yaw
-        float verticalInput = Mathf.Sign(-cross.x);    // X axis = pitch (negative due to Unity's convention)
+        float verticalInput = Mathf.Sign(-cross.x);    // X axis = pitch
 
         PivotRotation(horizontalInput, verticalInput);
 
-        // Aim is "close enough" when angle difference is small
         isAimed = angleDiff <= alignmentTolerance;
         return true;
     }
+
     private bool CalculateMortarAngles(
         Vector3 firePosition,
         Vector3 targetPosition,
@@ -64,7 +60,6 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
     {
         Vector3 toTarget = targetPosition - firePosition;
 
-        // Horizontal direction
         Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
         float x = toTargetXZ.magnitude;
         float y = toTarget.y;
@@ -77,32 +72,66 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
         {
             requiredYaw = 0f;
             requiredPitchHigh = 0f;
-            return false; // No valid firing arc
+            return false;
         }
 
         float sqrtDiscriminant = Mathf.Sqrt(discriminant);
         float angleHigh = Mathf.Atan((v2 + sqrtDiscriminant) / (gravity * x));
         requiredPitchHigh = angleHigh * Mathf.Rad2Deg;
 
-        // Convert world-space direction to mortar's local yaw
         Vector3 flatDirection = toTargetXZ.normalized;
         requiredYaw = Mathf.Atan2(flatDirection.x, flatDirection.z) * Mathf.Rad2Deg;
 
         return true;
     }
+
+    protected override void TryFire()
+    {
+        if (timeSinceLastShot >= fireCooldown)
+        {
+            timeSinceLastShot = 0f;
+
+            if (shellPrefab && firePoint)
+            {
+                GameObject shell = Instantiate(shellPrefab, firePoint.position, firePoint.rotation);
+                Rigidbody rb = shell.GetComponent<Rigidbody>();
+
+                if (rb != null)
+                {
+                    rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
+
+                    ApplyRecoil(); // RECOIL added after shot
+
+                    Debug.Log("AI Shell launched with recoil!");
+                }
+                else
+                {
+                    Debug.LogWarning("Shell prefab has no Rigidbody.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("ShellPrefab or FirePoint not assigned.");
+            }
+        }
+        else
+        {
+            Debug.Log("Still reloading...");
+        }
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (firePoint != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawRay(firePoint.position, firePoint.forward * 5f); // Shows current fire direction
+            Gizmos.DrawRay(firePoint.position, firePoint.forward * 5f);
 
             if (target != null)
             {
                 Gizmos.color = Color.green;
-                Gizmos.DrawLine(firePoint.position, target.position); // Target line
+                Gizmos.DrawLine(firePoint.position, target.position);
 
-                // Draw desired ballistic arc (optional)
                 Vector3 firePos = firePoint.position;
                 Vector3 targetPos = target.position;
                 float v = artilleryLauncher != null ? artilleryLauncher.muzzleVelocity : 10f;
@@ -110,10 +139,9 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
 
                 if (CalculateMortarAngles(firePos, targetPos, v, g, out float yaw, out float pitch))
                 {
-                    // Simulate a parabolic arc using physics steps
                     Vector3 dir = (targetPos - firePos).normalized;
                     Quaternion yawRot = Quaternion.Euler(0f, yaw, 0f);
-                    Quaternion pitchRot = Quaternion.Euler(-pitch, 0f, 0f); // NEGATIVE because Unity pitches down by +X
+                    Quaternion pitchRot = Quaternion.Euler(-pitch, 0f, 0f);
 
                     Vector3 launchDir = yawRot * pitchRot * Vector3.forward;
                     Vector3 velocity = launchDir * v;

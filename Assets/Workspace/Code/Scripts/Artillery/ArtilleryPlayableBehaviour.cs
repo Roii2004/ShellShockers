@@ -65,7 +65,7 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
 
                     GetCurrentProjectile?.Invoke(shell);
 
-                    //ApplyRecoil();
+                    ApplyRecoil();
 
                     Debug.Log("Shell launched!");
                 }

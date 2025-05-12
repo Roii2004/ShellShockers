@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic;
+using System.Collections;
 
 public abstract class ArtilleryBaseBehaviour : MonoBehaviour
 {
@@ -81,21 +81,46 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
         }
     }
 
-    /*protected void ApplyRecoil()
+    protected void ApplyRecoil()
     {
-        // Vertical tilt recoil
+        StopCoroutine(nameof(BlendRecoil)); // Stop if already blending
+        StartCoroutine(BlendRecoil());
+    }
+
+    private IEnumerator BlendRecoil()
+    {
+        float duration = 0.2f;
+        float elapsed = 0f;
+
+        // Current local rotations
+        Quaternion startVert = verticalPivotPoint.localRotation;
+        Quaternion startHoriz = horizontalPivotPoint.localRotation;
+
+        // Calculate target rotations with random recoil
         float currentX = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
-        float recoilX = currentX + UnityEngine.Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        float recoilX = currentX + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
         recoilX = Mathf.Clamp(recoilX, artilleryLauncher.minVerticalTilt, artilleryLauncher.maxVerticalTilt);
-        verticalPivotPoint.localRotation = Quaternion.Euler(recoilX, 0f, 0f);
+        Quaternion targetVert = Quaternion.Euler(recoilX, 0f, 0f);
 
-        // Horizontal tilt recoil
         float currentY = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
-        float recoilY = currentY + UnityEngine.Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        float recoilY = currentY + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
         recoilY = Mathf.Clamp(recoilY, artilleryLauncher.minHorizontalTilt, artilleryLauncher.maxHorizontalTilt);
-        horizontalPivotPoint.localRotation = Quaternion.Euler(0f, recoilY, 0f);
-    }*/
+        Quaternion targetHoriz = Quaternion.Euler(0f, recoilY, 0f);
 
+        // Smoothly interpolate to target
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            verticalPivotPoint.localRotation = Quaternion.Slerp(startVert, targetVert, t);
+            horizontalPivotPoint.localRotation = Quaternion.Slerp(startHoriz, targetHoriz, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure final position is exactly the target
+        verticalPivotPoint.localRotation = targetVert;
+        horizontalPivotPoint.localRotation = targetHoriz;
+    }
     protected float NormalizeAngle(float angle)
     {
         if (angle > 180f) angle -= 360f;
