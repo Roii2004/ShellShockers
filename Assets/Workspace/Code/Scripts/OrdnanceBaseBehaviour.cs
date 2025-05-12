@@ -30,7 +30,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     private void DetectUpcomingCollision()
     {
         if (hasTriggeredCamera || projectileSettings == null) return;
-
+        
         Vector3 direction = rb.linearVelocity.normalized;
         float speed = rb.linearVelocity.magnitude;
         float futureDistance = speed * projectileSettings.earlyCameraTriggerSeconds;

@@ -7,7 +7,17 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
     public SO_ArtilleryAIProfile aiProfile;
     public Transform target;
 
-    private const float alignmentTolerance = 1f; // degrees
+    private const float alignmentTolerance = 3f; // degrees
+    private float currentAccuracy;
+
+    private Vector3 currentInaccurateTarget;
+    private bool hasTargetLock = false;
+
+    private void Start()
+    {
+        base.Start();
+        currentAccuracy = aiProfile.aimingAccuracy;
+    }
 
     private void Update()
     {
@@ -15,10 +25,22 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
 
         if (target == null) return;
 
+        if (!hasTargetLock)
+        {
+            currentInaccurateTarget = GetInaccurateTarget(target.position);
+            hasTargetLock = true;
+        }
+        else
+        {
+            //code here
+        }
+
         if (AimWithBallistics(out bool isAimed) && isAimed)
         {
             TryFire();
         }
+
+        print(currentAccuracy);
     }
 
     private bool AimWithBallistics(out bool isAimed)
@@ -26,28 +48,43 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
         isAimed = false;
 
         Vector3 firePosition = firePoint.position;
-        Vector3 targetPosition = target.position;
+        Vector3 targetPosition = currentInaccurateTarget; // Stable target
+
         float muzzleVelocity = artilleryLauncher.muzzleVelocity;
         float gravity = Mathf.Abs(Physics.gravity.y);
 
         if (!CalculateMortarAngles(firePosition, targetPosition, muzzleVelocity, gravity, out float desiredYaw, out float desiredPitch))
-            return false; // No valid trajectory
+            return false;
 
         Quaternion yawRot = Quaternion.Euler(0f, desiredYaw, 0f);
-        Quaternion pitchRot = Quaternion.Euler(-desiredPitch, 0f, 0f); // -pitch: Unity pitches down for +X
+        Quaternion pitchRot = Quaternion.Euler(-desiredPitch, 0f, 0f);
         Vector3 desiredLaunchDir = yawRot * pitchRot * Vector3.forward;
 
         Vector3 currentDir = firePoint.forward;
         float angleDiff = Vector3.Angle(currentDir, desiredLaunchDir);
         Vector3 cross = Vector3.Cross(currentDir, desiredLaunchDir);
 
-        float horizontalInput = Mathf.Sign(cross.y);   // Y axis = yaw
-        float verticalInput = Mathf.Sign(-cross.x);    // X axis = pitch
+        float horizontalInput = Mathf.Sign(cross.y);
+        float verticalInput = Mathf.Sign(-cross.x);
 
         PivotRotation(horizontalInput, verticalInput);
 
         isAimed = angleDiff <= alignmentTolerance;
         return true;
+    }
+
+    private Vector3 GetInaccurateTarget(Vector3 actualTargetPos)
+    {
+        if (currentAccuracy >= 1f) return actualTargetPos;
+
+        float maxOffset = 20f; // Stronger inaccuracy
+        float inaccuracy = 1f - currentAccuracy;
+        float radius = maxOffset * Mathf.Pow(inaccuracy, 2f); // Non-linear falloff
+
+        Vector2 offset2D = Random.insideUnitCircle * radius;
+        Vector3 offset = new Vector3(offset2D.x, 0f, offset2D.y);
+
+        return actualTargetPos + offset;
     }
 
     private bool CalculateMortarAngles(
@@ -99,10 +136,11 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
                 if (rb != null)
                 {
                     rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
+                    ApplyRecoil();
 
-                    ApplyRecoil(); // RECOIL added after shot
-
-                    Debug.Log("AI Shell launched with recoil!");
+                    // Improve accuracy after shot
+                    currentAccuracy = Mathf.Min(1f, currentAccuracy + 0.1f);
+                    hasTargetLock = false;
                 }
                 else
                 {
@@ -114,51 +152,43 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
                 Debug.LogWarning("ShellPrefab or FirePoint not assigned.");
             }
         }
-        else
-        {
-            Debug.Log("Still reloading...");
-        }
     }
 
     private void OnDrawGizmosSelected()
     {
-        if (firePoint != null)
+        if (firePoint == null || target == null || artilleryLauncher == null || aiProfile == null)
+            return;
+
+        Vector3 firePos = firePoint.position;
+        Vector3 actualTarget = target.position;
+        Vector3 inaccurateTarget = currentInaccurateTarget;
+
+        // Line to real target
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(firePos, actualTarget);
+        Gizmos.DrawSphere(actualTarget, 0.5f);
+
+        // Line to inaccurate target
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(firePos, inaccurateTarget);
+        Gizmos.DrawSphere(inaccurateTarget, 0.5f);
+
+        // Draw the inaccuracy radius at target
+        float maxOffset = 20f;
+        float radius = maxOffset * Mathf.Pow(1f - currentAccuracy, 2f);
+
+        Gizmos.color = Color.red;
+        int segments = 32;
+        Vector3 center = actualTarget;
+        for (int i = 0; i < segments; i++)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay(firePoint.position, firePoint.forward * 5f);
+            float angle1 = (i / (float)segments) * Mathf.PI * 2;
+            float angle2 = ((i + 1) / (float)segments) * Mathf.PI * 2;
 
-            if (target != null)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(firePoint.position, target.position);
+            Vector3 point1 = center + new Vector3(Mathf.Cos(angle1), 0, Mathf.Sin(angle1)) * radius;
+            Vector3 point2 = center + new Vector3(Mathf.Cos(angle2), 0, Mathf.Sin(angle2)) * radius;
 
-                Vector3 firePos = firePoint.position;
-                Vector3 targetPos = target.position;
-                float v = artilleryLauncher != null ? artilleryLauncher.muzzleVelocity : 10f;
-                float g = Mathf.Abs(Physics.gravity.y);
-
-                if (CalculateMortarAngles(firePos, targetPos, v, g, out float yaw, out float pitch))
-                {
-                    Vector3 dir = (targetPos - firePos).normalized;
-                    Quaternion yawRot = Quaternion.Euler(0f, yaw, 0f);
-                    Quaternion pitchRot = Quaternion.Euler(-pitch, 0f, 0f);
-
-                    Vector3 launchDir = yawRot * pitchRot * Vector3.forward;
-                    Vector3 velocity = launchDir * v;
-
-                    Gizmos.color = Color.cyan;
-                    Vector3 pos = firePos;
-                    for (float t = 0; t < 30f; t += 0.05f)
-                    {
-                        Vector3 next = pos + velocity * 0.1f + 0.5f * Physics.gravity * 0.1f * 0.1f;
-                        Gizmos.DrawLine(pos, next);
-                        velocity += Physics.gravity * 0.1f;
-                        pos = next;
-                    }
-                }
-            }
+            Gizmos.DrawLine(point1, point2);
         }
     }
 }
-
-

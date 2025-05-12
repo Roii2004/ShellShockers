@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36ec642dc7b13d3479771a54264293b1, type: 3}
   m_Name: BaseAI
   m_EditorClassIdentifier: 
-  aimingAccuracy: 1
+  aimingAccuracy: 0.782
   strategyType: 0
   fireCooldownMultiplier: 1
   detectionRadius: 50

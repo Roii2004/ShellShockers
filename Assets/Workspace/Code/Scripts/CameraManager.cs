@@ -5,11 +5,11 @@ using System.Collections;
 
 public class CameraManager : MonoBehaviour
 {
-    [Header("Camera Settings")]
+   [Header("Camera Settings")]
     public CinemachineCamera projectileCam;
     public CinemachineCamera explosionCam;
-    public float explosionCamDuration = 3f;  // duration of the isometric view
-    
+    public float explosionCamDuration = 3f;
+
     private bool isFollowing;
     private GameObject toFollowProjectile;
 
@@ -33,50 +33,52 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
-        InputConsequences();
+        HandleInput();
     }
 
-    private void InputConsequences()
+    private void HandleInput()
     {
-        if (/*Input.GetKey(KeyCode.F) && */toFollowProjectile != null)
+        if (Input.GetKeyDown(KeyCode.F) && toFollowProjectile != null)
         {
             FollowProjectile(toFollowProjectile.transform);
         }
-        else
+
+        if (Input.GetKeyUp(KeyCode.F))
         {
             StopFollowProjectile();
         }
     }
 
-    void FollowProjectile(Transform projectile)
+    private void FollowProjectile(Transform projectile)
     {
-        projectileCam.Follow = projectile.transform;
-        projectileCam.LookAt = projectile.transform;
-        
+        projectileCam.Follow = projectile;
+        projectileCam.LookAt = projectile;
+
+        projectileCam.Priority = 20;
         projectileCam.enabled = true;
         isFollowing = true;
     }
-    
+
     private void StopFollowProjectile()
     {
+        projectileCam.Priority = 0;
         projectileCam.enabled = false;
         isFollowing = false;
     }
-    
+
     public void GetProjectile(GameObject projectile)
     {
         toFollowProjectile = projectile;
     }
 
-    public void ExplosionCameraTrigger(Vector3 explosionPosition,Rigidbody rb)
+    public void ExplosionCameraTrigger(Vector3 explosionPosition, Rigidbody rb)
     {
-        if (toFollowProjectile != null)
+        if (toFollowProjectile != null && rb != null && rb.gameObject == toFollowProjectile)
         {
             explosionCam.Priority = 30;
             projectileCam.Priority = 10;
 
-            // Dynamic isometric offset based on projectile's approach direction
-            Vector3 incomingDirection = -rb.linearVelocity.normalized;  
+            Vector3 incomingDirection = -rb.linearVelocity.normalized;
             Vector3 offset = incomingDirection * 30f + Vector3.up * 20f;
 
             explosionCam.transform.position = explosionPosition + offset;
@@ -85,11 +87,11 @@ public class CameraManager : MonoBehaviour
             explosionCam.enabled = true;
             projectileCam.enabled = false;
 
-            StartCoroutine(DisableExplosionCamAfterDelay());   
+            StartCoroutine(DisableExplosionCamAfterDelay());
         }
         else
         {
-            Debug.Log("The round must be fired by playable artillery to be followed");
+            Debug.Log("Explosion from a non-player projectile. Ignored.");
         }
     }
 
@@ -100,7 +102,11 @@ public class CameraManager : MonoBehaviour
         explosionCam.Priority = 0;
         explosionCam.enabled = false;
 
-        projectileCam.Priority = 20;
-        projectileCam.enabled = true;
+        // Restore projectileCam only if F is still held down
+        if (isFollowing && Input.GetKey(KeyCode.F))
+        {
+            projectileCam.Priority = 20;
+            projectileCam.enabled = true;
+        }
     }
 }

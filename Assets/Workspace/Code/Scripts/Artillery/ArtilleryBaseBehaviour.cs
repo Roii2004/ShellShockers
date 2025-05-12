@@ -92,22 +92,25 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
         float duration = 0.2f;
         float elapsed = 0f;
 
-        // Current local rotations
+        // Store current local rotations
         Quaternion startVert = verticalPivotPoint.localRotation;
         Quaternion startHoriz = horizontalPivotPoint.localRotation;
 
-        // Calculate target rotations with random recoil
+        // Get current angles
         float currentX = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
-        float recoilX = currentX + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
+        float currentY = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
+
+        // Apply backward vertical recoil only (always tilts up)
+        float recoilX = currentX - Random.Range(0f, artilleryLauncher.recoilAmount);
         recoilX = Mathf.Clamp(recoilX, artilleryLauncher.minVerticalTilt, artilleryLauncher.maxVerticalTilt);
         Quaternion targetVert = Quaternion.Euler(recoilX, 0f, 0f);
 
-        float currentY = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
+        // Optional: slight horizontal wiggle (left or right)
         float recoilY = currentY + Random.Range(-artilleryLauncher.recoilAmount, artilleryLauncher.recoilAmount);
         recoilY = Mathf.Clamp(recoilY, artilleryLauncher.minHorizontalTilt, artilleryLauncher.maxHorizontalTilt);
         Quaternion targetHoriz = Quaternion.Euler(0f, recoilY, 0f);
 
-        // Smoothly interpolate to target
+        // Smooth blend
         while (elapsed < duration)
         {
             float t = elapsed / duration;
@@ -117,7 +120,7 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
             yield return null;
         }
 
-        // Ensure final position is exactly the target
+        // Snap to exact target rotations
         verticalPivotPoint.localRotation = targetVert;
         horizontalPivotPoint.localRotation = targetHoriz;
     }
