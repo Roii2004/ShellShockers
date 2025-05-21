@@ -1,7 +1,8 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-
+using Photon.Pun;
+[RequireComponent(typeof(PhotonView))]
 public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
 {
     [Header("Trajectory Preview")]
@@ -10,10 +11,13 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
     public float maxSimTime = 5f;  // Max time to simulate
     
     public static Action<GameObject> GetCurrentProjectile;
-
+    private PhotonView _photonView;
     protected override void Start()
     {
         base.Start();
+        
+        _photonView = GetComponent<PhotonView>();
+        
         if (trajectoryLine != null)
             trajectoryLine.enabled = true;
     }
@@ -22,7 +26,10 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
     {
         base.Update();
 
-        PlayerInput();
+        if (!_photonView.IsMine)
+        {
+            PlayerInput();
+        }
     }
 
     private void PlayerInput()

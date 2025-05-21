@@ -13,12 +13,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.ConnectUsingSettings();
     }
-
-    void Update()
-    {
-        
-    }
-
+    
     public override void OnConnectedToMaster()
     {
         // This confirms the client is connected to the Photon master server
@@ -31,7 +26,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     {
 
         Debug.Log("Joined Lobby.");
-        Photon.Realtime.RoomOptions roomOptions = new Photon.Realtime.RoomOptions
+        RoomOptions roomOptions = new RoomOptions
         {
             MaxPlayers = 2,
             IsVisible = true,
