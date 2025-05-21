@@ -187,7 +187,7 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
 
             Vector3 point1 = center + new Vector3(Mathf.Cos(angle1), 0, Mathf.Sin(angle1)) * radius;
             Vector3 point2 = center + new Vector3(Mathf.Cos(angle2), 0, Mathf.Sin(angle2)) * radius;
-
+           //hola perro
             Gizmos.DrawLine(point1, point2);
         }
     }
