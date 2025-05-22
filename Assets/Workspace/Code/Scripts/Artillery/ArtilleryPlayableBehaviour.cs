@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Photon.Pun;
 [RequireComponent(typeof(PhotonView))]
-public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
+public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
 {
     [Header("Trajectory Preview")]
     public LineRenderer trajectoryLine;
@@ -26,7 +26,8 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
     {
         base.Update();
 
-        if (!_photonView.IsMine)
+        
+        if (_photonView.IsMine)
         {
             PlayerInput();
         }
@@ -122,6 +123,23 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour
 
         trajectoryLine.positionCount = points.Count;
         trajectoryLine.SetPositions(points.ToArray());
+    }
+    
+    
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            Debug.Log($"[SEND] My vertical rotation: {verticalPivotPoint.localEulerAngles}");
+            // Only send vertical pivot, horizontal is handled by PhotonTransformView
+            stream.SendNext(verticalPivotPoint.localEulerAngles);
+        }
+        else
+        {
+            Vector3 verticalRotation = (Vector3)stream.ReceiveNext();
+            Debug.Log($"[RECEIVE] Applying vertical rotation: {verticalRotation}");
+            verticalPivotPoint.localEulerAngles = verticalRotation;
+        }
     }
 }
 
