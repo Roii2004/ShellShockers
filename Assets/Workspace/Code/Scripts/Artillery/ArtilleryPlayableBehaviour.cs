@@ -64,7 +64,7 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
 
             if (shellPrefab && firePoint)
             {
-                GameObject shell = Instantiate(shellPrefab, firePoint.position, firePoint.rotation);
+                GameObject shell =PhotonNetwork.Instantiate("NetworkPrefabs/Round", firePoint.position, firePoint.rotation);
                 Rigidbody rb = shell.GetComponent<Rigidbody>();
 
                 if (rb != null)
@@ -130,14 +130,12 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
     {
         if (stream.IsWriting)
         {
-            Debug.Log($"[SEND] My vertical rotation: {verticalPivotPoint.localEulerAngles}");
             // Only send vertical pivot, horizontal is handled by PhotonTransformView
             stream.SendNext(verticalPivotPoint.localEulerAngles);
         }
         else
         {
             Vector3 verticalRotation = (Vector3)stream.ReceiveNext();
-            Debug.Log($"[RECEIVE] Applying vertical rotation: {verticalRotation}");
             verticalPivotPoint.localEulerAngles = verticalRotation;
         }
     }
