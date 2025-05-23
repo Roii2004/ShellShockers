@@ -75,12 +75,8 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
 
                 if (rb != null)
                 {
-                    rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
-
-                    GetCurrentProjectile?.Invoke(shell);
-
-                    ApplyRecoil();
-
+                    Fire(rb);
+                    
                     Debug.Log("Shell launched!");
                 }
                 else
@@ -144,5 +140,19 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
             Vector3 verticalRotation = (Vector3)stream.ReceiveNext();
             verticalPivotPoint.localEulerAngles = verticalRotation;
         }
+    }
+
+    public override void Fire(Rigidbody rb)
+    {
+        //Fire is different in base, playable and AI mortar
+        photonView.RPC("RPC_ShowMuzzleFlash", RpcTarget.All, firePoint.position);
+        base.Fire(rb);
+        ApplyRecoil();
+    }
+    
+    [PunRPC]
+    void RPC_ShowMuzzleFlash(Vector3 firingPointPosition)
+    {
+        Instantiate(artilleryLauncher.muzzleEffects, firingPointPosition , Quaternion.identity);
     }
 }

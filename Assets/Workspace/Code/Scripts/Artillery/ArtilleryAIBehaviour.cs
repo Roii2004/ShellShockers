@@ -136,11 +136,8 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
                 if (rb != null)
                 {
                     rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
-                    ApplyRecoil();
-
-                    // Improve accuracy after shot
-                    currentAccuracy = Mathf.Min(1f, currentAccuracy + 0.1f);
-                    hasTargetLock = false;
+                    //Fire is different in base, playable and AI mortar
+                    Fire(rb);
                 }
                 else
                 {
@@ -190,5 +187,15 @@ public class ArtilleryAIBehaviour : ArtilleryBaseBehaviour
            //hola perro
             Gizmos.DrawLine(point1, point2);
         }
+    }
+
+    public override void Fire(Rigidbody rb)
+    {
+        base.Fire(rb);
+        ApplyRecoil();
+
+        // Improve accuracy after shot
+        currentAccuracy = Mathf.Min(1f, currentAccuracy + 0.1f);
+        hasTargetLock = false;
     }
 }

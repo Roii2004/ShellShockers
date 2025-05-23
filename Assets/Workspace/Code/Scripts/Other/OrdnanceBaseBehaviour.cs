@@ -1,6 +1,6 @@
 using System;
+using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Rigidbody))]
 public class OrdnanceBaseBehaviour : MonoBehaviour
@@ -79,4 +79,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     {
         Explode();
     }
+
+    
+    
 }

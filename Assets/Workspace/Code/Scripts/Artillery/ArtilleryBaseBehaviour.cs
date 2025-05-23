@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
-public abstract class ArtilleryBaseBehaviour : MonoBehaviour
+public abstract class ArtilleryBaseBehaviour : MonoBehaviourPun
 {
     [Header("Scriptable Object")]
     public SO_ArtilleryLauncher artilleryLauncher;
@@ -59,11 +60,7 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
 
                 if (rb != null)
                 {
-                    rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
-
-                    //ApplyRecoil();
-
-                    Debug.Log("Shell launched!");
+                    Fire(rb);
                 }
                 else
                 {
@@ -79,6 +76,14 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviour
         {
             Debug.Log("Still reloading...");
         }
+    }
+
+    public virtual void Fire(Rigidbody rb)
+    {
+        //Fire is different in base, playable and AI mortar
+
+        rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
+        Debug.Log("Shell launched!");
     }
 
     protected void ApplyRecoil()

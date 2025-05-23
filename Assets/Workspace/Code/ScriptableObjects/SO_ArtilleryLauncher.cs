@@ -21,4 +21,7 @@ public class SO_ArtilleryLauncher : ScriptableObject
     [Header("Horizontal Tilt Limits")]
     [Range(-180f, 180f)] public float minHorizontalTilt = -30f;
     [Range(-180f, 180f)] public float maxHorizontalTilt = 30f;
+    
+    [Header("VFX")]
+    public GameObject muzzleEffects;
 }
