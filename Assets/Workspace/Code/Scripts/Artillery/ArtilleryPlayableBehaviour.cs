@@ -67,6 +67,12 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
                 GameObject shell =PhotonNetwork.Instantiate("NetworkPrefabs/Round", firePoint.position, firePoint.rotation);
                 Rigidbody rb = shell.GetComponent<Rigidbody>();
 
+                PhotonView shellView = shell.GetComponent<PhotonView>();
+                if (shellView == null)
+                {
+                    Debug.LogError("Shell instantiated without a PhotonView! Ensure that both the root GameObject and the visual child of the shell prefab have a PhotonView and PhotonTransformView.");
+                }
+
                 if (rb != null)
                 {
                     rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
@@ -140,4 +146,3 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
         }
     }
 }
-
