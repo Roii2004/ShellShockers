@@ -6,6 +6,10 @@ public class SO_Projectiles : ScriptableObject
     [Header("Basic Info")]
     public string projectileName;
     public bool isPlayerProjectile=false;
+    
+    [Header("Basic Info")]
+    public float explosionRadius = 5f;
+    public float damage = 5f;
 
     [Header("VFX")]
     public GameObject onImpactEffect;

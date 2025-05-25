@@ -1,8 +1,7 @@
 using System;
 using Photon.Pun;
 using UnityEngine;
-
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PhotonView))]
 public class OrdnanceBaseBehaviour : MonoBehaviour
 {
     [Header("SO Settings")] 
@@ -14,11 +13,14 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     public static Action<Vector3,Rigidbody> onExplosionDetectionTriggered;
     private Rigidbody rb;
     private bool hasTriggeredCamera = false;
+    private PhotonView _photonView;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        
+        _photonView = GetComponent<PhotonView>();
     }
 
     void Update()
@@ -51,6 +53,22 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         {
             Instantiate(projectileSettings.onImpactEffect,
                 transform.position, Quaternion.identity);
+        }
+
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, projectileSettings.explosionRadius);
+        foreach (var hitCollider in hitColliders)
+        {
+            Debug.Log($"Explosion hit: {hitCollider.gameObject.name}");
+
+            PhotonView targetView = hitCollider.GetComponentInParent<PhotonView>();
+            if (targetView != null && targetView != _photonView && NetworkEventsManager.Instance != null)
+            {
+                PhotonView routerView = NetworkEventsManager.Instance.GetComponent<PhotonView>();
+                if (routerView != null)
+                {
+                    routerView.RPC("RequestDamage", RpcTarget.MasterClient, targetView.ViewID, projectileSettings.damage);
+                }
+            }
         }
 
         Destroy(gameObject);
