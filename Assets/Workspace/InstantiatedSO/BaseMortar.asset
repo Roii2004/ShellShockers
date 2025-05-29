@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ce72e1cd2816214081217f37e240d63, type: 3}
   m_Name: BaseMortar
   m_EditorClassIdentifier: 
+  health: 100
   artilleryName: Mortar
   roundsPerMinute: 30
   muzzleVelocity: 26.18

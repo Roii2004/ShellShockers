@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Photon.Pun;
 [RequireComponent(typeof(PhotonView))]
+[RequireComponent(typeof(HealthBehaviour))]
 public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
 {
     [Header("Trajectory Preview")]

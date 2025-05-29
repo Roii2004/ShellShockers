@@ -49,26 +49,52 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     
     private void Explode()
     {
-        if (projectileSettings != null && projectileSettings.onImpactEffect != null)
+        if (projectileSettings == null)
+        {
+            Debug.LogWarning("Explode called but projectileSettings is null.");
+            return;
+        }
+
+        if (projectileSettings.onImpactEffect != null)
         {
             Instantiate(projectileSettings.onImpactEffect,
                 transform.position, Quaternion.identity);
         }
 
+        Debug.Log($"Exploding at {transform.position} with radius {projectileSettings.explosionRadius}");
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, projectileSettings.explosionRadius);
         foreach (var hitCollider in hitColliders)
         {
             Debug.Log($"Explosion hit: {hitCollider.gameObject.name}");
 
             PhotonView targetView = hitCollider.GetComponentInParent<PhotonView>();
-            if (targetView != null && targetView != _photonView && NetworkEventsManager.Instance != null)
+            if (targetView == null)
             {
-                PhotonView routerView = NetworkEventsManager.Instance.GetComponent<PhotonView>();
-                if (routerView != null)
-                {
-                    routerView.RPC("RequestDamage", RpcTarget.MasterClient, targetView.ViewID, projectileSettings.damage);
-                }
+                Debug.LogWarning($"No PhotonView found in {hitCollider.gameObject.name} or its parents.");
+                continue;
             }
+
+            if (targetView == _photonView)
+            {
+                Debug.Log($"Skipping self: {targetView.ViewID}");
+                continue;
+            }
+
+            if (NetworkEventsManager.Instance == null)
+            {
+                Debug.LogError("NetworkEventsManager.Instance is null! Cannot send damage RPC.");
+                continue;
+            }
+
+            PhotonView routerView = NetworkEventsManager.Instance.GetComponent<PhotonView>();
+            if (routerView == null)
+            {
+                Debug.LogError("Router PhotonView is null on NetworkEventsManager.");
+                continue;
+            }
+
+            Debug.Log($"Sending RequestDamage to {targetView.ViewID} for {projectileSettings.damage} damage.");
+            routerView.RPC("RequestDamage", RpcTarget.MasterClient, targetView.ViewID, projectileSettings.damage);
         }
 
         Destroy(gameObject);
@@ -97,7 +123,4 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     {
         Explode();
     }
-
-    
-    
 }

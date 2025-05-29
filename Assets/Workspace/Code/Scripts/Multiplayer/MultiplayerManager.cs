@@ -24,7 +24,6 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-
         Debug.Log("Joined Lobby.");
         RoomOptions roomOptions = new RoomOptions
         {

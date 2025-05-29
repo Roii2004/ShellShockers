@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SO_ArtilleryLauncher", menuName = "Scriptable Objects/ArtilleryLauncher")]
-public class SO_ArtilleryLauncher : ScriptableObject
+public class SO_ArtilleryLauncher : SO_AliveEntity
 {
     [Header("Basic Info")]
     public string artilleryName;
