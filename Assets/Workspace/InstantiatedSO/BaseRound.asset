@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: BaseRound
   m_EditorClassIdentifier: 
   projectileName: Round
+  isPlayerProjectile: 0
+  explosionRadius: 5
+  damage: 20
   onImpactEffect: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
   spinSpeed: 720
   tiltSpeed: 5

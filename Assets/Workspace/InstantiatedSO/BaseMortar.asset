@@ -15,8 +15,8 @@ MonoBehaviour:
   health: 100
   artilleryName: Mortar
   roundsPerMinute: 30
-  muzzleVelocity: 26.18
-  recoilAmount: 31.62
+  muzzleVelocity: 10
+  recoilAmount: 30
   tiltSpeed: 25
   minVerticalTilt: -90
   maxVerticalTilt: 90

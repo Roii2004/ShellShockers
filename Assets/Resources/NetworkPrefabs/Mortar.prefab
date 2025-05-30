@@ -133,7 +133,6 @@ GameObject:
   - component: {fileID: 9168082408995579001}
   - component: {fileID: 4748378437394919775}
   - component: {fileID: 5118155350692618265}
-  - component: {fileID: 8308305060694853329}
   m_Layer: 0
   m_Name: Base
   m_TagString: Untagged
@@ -209,27 +208,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8308305060694853329
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2343922435649111136}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3606495628398453941
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,6 +221,7 @@ GameObject:
   - component: {fileID: -5193369805355488204}
   - component: {fileID: -6051091070817249250}
   - component: {fileID: 6123385811219990568}
+  - component: {fileID: 5938065207841068869}
   m_Layer: 0
   m_Name: Mortar
   m_TagString: Untagged
@@ -339,6 +318,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aliveEntity: {fileID: 11400000, guid: 4d20e3f0a52a0b846b5244086463ad27, type: 2}
+--- !u!65 &5938065207841068869
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3606495628398453941}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1.4416103, z: 0.56424475}
+  m_Center: {x: 0, y: 1.167479, z: -0.0035014004}
 --- !u!1 &4244006133666900243
 GameObject:
   m_ObjectHideFlags: 0
@@ -520,7 +520,6 @@ GameObject:
   - component: {fileID: 7474823799216948197}
   - component: {fileID: 5205242726516590133}
   - component: {fileID: 6589676855412307407}
-  - component: {fileID: 1910289592210001800}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -596,26 +595,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &1910289592210001800
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8961389468442061085}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}

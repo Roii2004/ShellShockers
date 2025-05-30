@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Photon.Pun;
 
@@ -7,9 +8,8 @@ public class HealthBehaviour : MonoBehaviourPun, IDamageable
     private float _health;
     void Start()
     {
-        aliveEntity.health = _health;
+        _health=aliveEntity.health;
     }
-    
 
     [PunRPC]
     public void TakeDamage(float amount)

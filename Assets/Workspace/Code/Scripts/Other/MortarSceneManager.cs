@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class MortarSceneManager : MonoBehaviour
 {
+    public Transform spawnPointPlayer1;
+    public Transform spawnPointPlayer2;
     void Start()
     {
         if (PhotonNetwork.InRoom)
@@ -12,8 +14,10 @@ public class MortarSceneManager : MonoBehaviour
             // The object must have a PhotonView component to be network-aware
             // This instantiates the object across the network and assigns ownership to this client
             
-            Vector3 spawnOffset = new Vector3(PhotonNetwork.CurrentRoom.PlayerCount * 2f, 0, 0);
+            Vector3 spawnOffset = (PhotonNetwork.LocalPlayer.ActorNumber == 1) ? spawnPointPlayer1.position : spawnPointPlayer2.position;
             GameObject playerMortar = PhotonNetwork.Instantiate("NetworkPrefabs/Mortar", spawnOffset, Quaternion.identity);
+            string playerName = $"Mortar_Player{PhotonNetwork.LocalPlayer.ActorNumber}";
+            playerMortar.name = playerName;
 
             PhotonView pv = playerMortar.GetComponent<PhotonView>();
             if (pv != null)
