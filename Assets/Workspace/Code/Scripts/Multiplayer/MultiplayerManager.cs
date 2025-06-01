@@ -17,7 +17,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         // This confirms the client is connected to the Photon master server
-        Debug.Log("Connected to Photon Master Server.");
+        //Debug.Log("Connected to Photon Master Server.");
         
         PhotonNetwork.JoinLobby();
     }
@@ -33,7 +33,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         };
 
         PhotonNetwork.CreateRoom("DrMikeGym", roomOptions);
-        Debug.Log("Creating the sacred room of hypertrophy. Gains await. No cardio allowed.");
+        //Debug.Log("Creating the sacred room of hypertrophy. Gains await. No cardio allowed.");
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -53,14 +53,14 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             item.GetComponentInChildren<UnityEngine.UI.Button>().onClick.AddListener(() =>
             {
                 PhotonNetwork.JoinRoom(room.Name);
-                Debug.Log("Attempting to join the temple of iron: " + room.Name);
+                //Debug.Log("Attempting to join the temple of iron: " + room.Name);
             });
         }
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("Entered the temple. Let the gains begin.");
+        //Debug.Log("Entered the temple. Let the gains begin.");
         PhotonNetwork.LoadLevel("MortarScene");
     }
 }

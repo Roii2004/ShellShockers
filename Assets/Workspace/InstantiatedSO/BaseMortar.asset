@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   artilleryName: Mortar
-  roundsPerMinute: 30
+  roundsPerMinute: 80
   muzzleVelocity: 10
-  recoilAmount: 30
-  tiltSpeed: 25
+  recoilAmount: 0
+  tiltSpeed: 100
   minVerticalTilt: -90
   maxVerticalTilt: 90
   minHorizontalTilt: -180

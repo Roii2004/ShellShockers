@@ -11,16 +11,8 @@ public class HealthBehaviour : MonoBehaviourPun, IDamageable
         _health=aliveEntity.health;
     }
 
-    [PunRPC]
     public void TakeDamage(float amount)
     {
-        print( gameObject.name+ " has taken damage");
-        _health -= amount;
-        print( gameObject.name+ " has" + _health);
-
-        if (_health <= 0)
-        {
-            //Die
-        }
+        
     }
 }

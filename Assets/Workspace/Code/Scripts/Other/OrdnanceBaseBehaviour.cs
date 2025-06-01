@@ -15,6 +15,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     private Rigidbody rb;
     private bool hasTriggeredCamera = false;
     private PhotonView _photonView;
+    private bool _hasExploded = false;
 
     void Start()
     {
@@ -50,11 +51,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     
     private void Explode()
     {
-        // Optional cleanup (destroy shell)
-        if (_photonView.IsMine)
-        {
-            PhotonNetwork.Destroy(gameObject);
-        }
+        
     }
 
     private void VFXLogic()
