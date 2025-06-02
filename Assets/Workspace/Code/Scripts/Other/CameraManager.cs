@@ -91,7 +91,7 @@ public class CameraManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Explosion from a non-player projectile. Ignored.");
+            //Debug.Log("Explosion from a non-player projectile. Ignored.");
         }
     }
 

@@ -83,7 +83,7 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviourPun
         //Fire is different in base, playable and AI mortar
 
         rb.linearVelocity = firePoint.forward * artilleryLauncher.muzzleVelocity;
-        Debug.Log("Shell launched!");
+        //Debug.Log("Shell launched!");
     }
 
     protected void ApplyRecoil()

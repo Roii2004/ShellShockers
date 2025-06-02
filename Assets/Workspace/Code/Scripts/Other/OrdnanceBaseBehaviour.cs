@@ -49,25 +49,11 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         }
     }
     
-    private bool ShouldSkipExplosion()
+    private void Explode()
     {
-        if (_hasExploded) return true;
+        if (_hasExploded) return;
         _hasExploded = true;
-        return false;
-    }
 
-    private bool TrySendExplosionRequestToMaster()
-    {
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            _photonView.RPC("RequestDamage", RpcTarget.MasterClient, transform.position, _photonView.ViewID);
-            return true;
-        }
-        return false;
-    }
-
-    private void ApplyExplosionDamage()
-    {
         Collider[] hits = Physics.OverlapSphere(transform.position, projectileSettings.explosionRadius);
         HashSet<int> damagedViews = new HashSet<int>();
 
@@ -86,10 +72,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
                 NetworkEventsManager.Instance.RequestDamage(targetView.ViewID, projectileSettings.damage);
             }
         }
-    }
 
-    private void DestroyShell()
-    {
         if (_photonView.IsMine)
         {
             PhotonNetwork.Destroy(gameObject);
@@ -98,14 +81,6 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    private void Explode()
-    {
-        if (ShouldSkipExplosion()) return;
-        if (TrySendExplosionRequestToMaster()) return;
-        ApplyExplosionDamage();
-        DestroyShell();
     }
 
     private void VFXLogic()
