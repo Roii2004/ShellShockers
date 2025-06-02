@@ -49,9 +49,63 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         }
     }
     
+    private bool ShouldSkipExplosion()
+    {
+        if (_hasExploded) return true;
+        _hasExploded = true;
+        return false;
+    }
+
+    private bool TrySendExplosionRequestToMaster()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            _photonView.RPC("RequestDamage", RpcTarget.MasterClient, transform.position, _photonView.ViewID);
+            return true;
+        }
+        return false;
+    }
+
+    private void ApplyExplosionDamage()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, projectileSettings.explosionRadius);
+        HashSet<int> damagedViews = new HashSet<int>();
+
+        foreach (var hit in hits)
+        {
+            PhotonView targetView = hit.GetComponentInParent<PhotonView>();
+
+            if (targetView == null || damagedViews.Contains(targetView.ViewID) || targetView.ViewID == _photonView.ViewID)
+            {
+                continue;
+            }
+
+            if (hit.GetComponentInParent<IDamageable>() != null)
+            {
+                damagedViews.Add(targetView.ViewID);
+                NetworkEventsManager.Instance.RequestDamage(targetView.ViewID, projectileSettings.damage);
+            }
+        }
+    }
+
+    private void DestroyShell()
+    {
+        if (_photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     private void Explode()
     {
-        
+        if (ShouldSkipExplosion()) return;
+        if (TrySendExplosionRequestToMaster()) return;
+        ApplyExplosionDamage();
+        DestroyShell();
     }
 
     private void VFXLogic()

@@ -15,4 +15,11 @@ public class NetworkEventsManager : MonoBehaviourPun
             Destroy(gameObject); 
         }
     }
+    
+    [PunRPC]
+    public void RequestDamage(int targetViewID, float damage)
+    {
+        PhotonView target = PhotonView.Find(targetViewID);
+        target.RPC("TakeDamage",target.Owner, damage);
+    }
 }

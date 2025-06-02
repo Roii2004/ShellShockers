@@ -11,8 +11,10 @@ public class HealthBehaviour : MonoBehaviourPun, IDamageable
         _health=aliveEntity.health;
     }
 
+    [PunRPC]
     public void TakeDamage(float amount)
     {
-        
+        _health -= amount;
+        Debug.Log( "FROM EDITOR"+gameObject.name + " has" + _health);
     }
 }
