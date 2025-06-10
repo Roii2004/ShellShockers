@@ -30,30 +30,36 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         DetectUpcomingCollision();
         VFXLogic();
     }
-
-    private void DetectUpcomingCollision()
-    {
-        if (hasTriggeredCamera || projectileSettings == null) return;
-        
-        Vector3 direction = rb.linearVelocity.normalized;
-        float speed = rb.linearVelocity.magnitude;
-        float futureDistance = speed * projectileSettings.earlyCameraTriggerSeconds;
-
-        if (Physics.SphereCast(transform.position, projectileSettings.detectionRadius, direction,
-                out RaycastHit hit, futureDistance, projectileSettings.collisionMask))
-        {
-            hasTriggeredCamera = true;
-            Vector3 impactPosition = hit.point;
-
-            onExplosionDetectionTriggered?.Invoke(impactPosition,rb);
-        }
-    }
     
     private void Explode()
     {
         if (_hasExploded) return;
         _hasExploded = true;
 
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            NetworkEventsManager.Instance.RequestExplosion(_photonView.ViewID, transform.position);
+            return;
+        }
+
+        ApplyExplosionLogic();
+        DestroyShell();
+        _photonView.RPC("OnExplodeVFX",RpcTarget.All, transform.position);
+
+    }
+
+    public void ForceExplode()
+    {
+        if (_hasExploded) return;
+        _hasExploded = true;
+
+        ApplyExplosionLogic();
+        DestroyShell();
+        _photonView.RPC("OnExplodeVFX",RpcTarget.All, transform.position);
+    }
+
+    private void ApplyExplosionLogic()
+    {
         Collider[] hits = Physics.OverlapSphere(transform.position, projectileSettings.explosionRadius);
         HashSet<int> damagedViews = new HashSet<int>();
 
@@ -72,17 +78,25 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
                 NetworkEventsManager.Instance.RequestDamage(targetView.ViewID, projectileSettings.damage);
             }
         }
+    }
+    
+    private void DetectUpcomingCollision()
+    {
+        if (hasTriggeredCamera || projectileSettings == null) return;
+        
+        Vector3 direction = rb.linearVelocity.normalized;
+        float speed = rb.linearVelocity.magnitude;
+        float futureDistance = speed * projectileSettings.earlyCameraTriggerSeconds;
 
-        if (_photonView.IsMine)
+        if (Physics.SphereCast(transform.position, projectileSettings.detectionRadius, direction,
+                out RaycastHit hit, futureDistance, projectileSettings.collisionMask))
         {
-            PhotonNetwork.Destroy(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
+            hasTriggeredCamera = true;
+            Vector3 impactPosition = hit.point;
+
+            onExplosionDetectionTriggered?.Invoke(impactPosition,rb);
         }
     }
-
     private void VFXLogic()
     {
         visualModelTransform.Rotate(Vector3.up, projectileSettings.spinSpeed * Time.deltaTime, Space.Self);
@@ -102,6 +116,24 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         }
     }
     
+    private void DestroyShell()
+    {
+        if (_photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    [PunRPC]
+    public void OnExplodeVFX(Vector3 impactPosition)
+    {
+        Instantiate(projectileSettings.onImpactEffect, impactPosition , Quaternion.identity);
+
+    }
     private void OnTriggerEnter(Collider other)
     {
         Explode();
