@@ -38,14 +38,13 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
 
         if (!PhotonNetwork.IsMasterClient)
         {
-            NetworkEventsManager.Instance.RequestExplosion(_photonView.ViewID, transform.position);
+            NetworkEventsManager.Instance.RequestExplosion(_photonView.ViewID, transform.position); 
             return;
         }
 
         ApplyExplosionLogic();
-        DestroyShell();
         _photonView.RPC("OnExplodeVFX",RpcTarget.All, transform.position);
-
+        DestroyShell();
     }
 
     public void ForceExplode()
@@ -54,8 +53,8 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
         _hasExploded = true;
 
         ApplyExplosionLogic();
-        DestroyShell();
         _photonView.RPC("OnExplodeVFX",RpcTarget.All, transform.position);
+        DestroyShell();
     }
 
     private void ApplyExplosionLogic()
