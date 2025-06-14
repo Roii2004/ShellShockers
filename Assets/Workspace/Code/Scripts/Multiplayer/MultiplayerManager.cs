@@ -4,63 +4,69 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+
 public class MultiplayerManager : MonoBehaviourPunCallbacks
 {
-    
+    [Header("UI References")]
+    public TMP_InputField roomNameInput;
+    public Button createRoomButton;
+
     public Transform roomListContainer;
     public GameObject roomListItemPrefab;
+
     void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
+        createRoomButton.onClick.AddListener(CreateRoom);
     }
-    
+
     public override void OnConnectedToMaster()
     {
-        // This confirms the client is connected to the Photon master server
-        //Debug.Log("Connected to Photon Master Server.");
-        
         PhotonNetwork.JoinLobby();
     }
 
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby.");
-        RoomOptions roomOptions = new RoomOptions
+        // Now user manually clicks "Create Room"
+    }
+
+    public void CreateRoom()
+    {
+        string roomName = string.IsNullOrEmpty(roomNameInput.text) ? "Room_" + UnityEngine.Random.Range(1000, 9999) : roomNameInput.text;
+
+        PhotonNetwork.CreateRoom(roomName, new RoomOptions
         {
             MaxPlayers = 2,
             IsVisible = true,
             IsOpen = true
-        };
-
-        PhotonNetwork.CreateRoom("DrMikeGym", roomOptions);
-        //Debug.Log("Creating the sacred room of hypertrophy. Gains await. No cardio allowed.");
+        });
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        // Step 1: Clear the old room buttons
+        // Clear old UI
         foreach (Transform child in roomListContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // Step 2: Loop through the updated room list and spawn new buttons
+        // Populate list
         foreach (RoomInfo room in roomList)
         {
-            GameObject item = Instantiate(roomListItemPrefab, roomListContainer);
-            item.GetComponentInChildren<TextMeshProUGUI>().text = room.Name;
+            if (room.RemovedFromList || !room.IsOpen || !room.IsVisible)
+                continue;
 
-            item.GetComponentInChildren<UnityEngine.UI.Button>().onClick.AddListener(() =>
-            {
-                PhotonNetwork.JoinRoom(room.Name);
-                //Debug.Log("Attempting to join the temple of iron: " + room.Name);
-            });
+            GameObject item = Instantiate(roomListItemPrefab, roomListContainer);
+            var ui = item.GetComponent<RoomListItemUI>();
+            ui.SetRoomInfo(room);
+            ui.SetJoinAction(() => PhotonNetwork.JoinRoom(room.Name));
         }
     }
 
     public override void OnJoinedRoom()
     {
-        //Debug.Log("Entered the temple. Let the gains begin.");
         PhotonNetwork.LoadLevel("MortarScene");
     }
 }
