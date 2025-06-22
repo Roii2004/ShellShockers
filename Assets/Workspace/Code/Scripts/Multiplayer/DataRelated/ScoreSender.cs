@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -5,6 +6,11 @@ using System.Collections;
 
 public class ScoreSender : MonoBehaviour
 {
+    private void Start()
+    {
+        SendScore("Roi",850);
+    }
+
     public void SendScore(string playerName, int score)
     {
         StartCoroutine(SendScoreCoroutine(playerName, score));
