@@ -6,14 +6,10 @@ using System.Collections;
 
 public class ScoreSender : MonoBehaviour
 {
-    private void Start()
+    
+    public void SendScore(int score)
     {
-        SendScore("Roi",850);
-    }
-
-    public void SendScore(string playerName, int score)
-    {
-        StartCoroutine(SendScoreCoroutine(playerName, score));
+        StartCoroutine(SendScoreCoroutine(PlayerData.PlayerName, score));
     }
     
     private IEnumerator SendScoreCoroutine(string playerName, int score)
