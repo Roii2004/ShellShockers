@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public class MultiplayerManager : MonoBehaviourPunCallbacks
 {
@@ -122,11 +124,44 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             Destroy(child.gameObject);
         }
 
-        // Example placeholder data
-        for (int i = 0; i < 10; i++)
+        StartCoroutine(FetchAndDisplayScores());
+    }
+
+    private IEnumerator FetchAndDisplayScores()
+    {
+        UnityWebRequest request = UnityWebRequest.Get("http://localhost:3000/topscores");
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Failed to fetch scores: " + request.error);
+            yield break;
+        }
+
+        string wrappedJson = "{\"scores\":" + request.downloadHandler.text + "}";
+        
+        //function takes a JSON string and parses it into an object of type ScoreEntryList .
+        ScoreEntryList scoreList = JsonUtility.FromJson<ScoreEntryList>(wrappedJson);
+
+        foreach (ScoreEntry entry in scoreList.scores)
         {
             GameObject row = Instantiate(scoreboardItemPrefab, UIListContainer);
-            row.GetComponentInChildren<TMPro.TMP_Text>().text = $"Player_{i + 1} - {1000 - i * 100}";
+            PlayerNameScoreButtonUI ui = row.GetComponent<PlayerNameScoreButtonUI>();
+            ui.playerNameText.text = entry.playerName;
+            ui.playerScoreText.text = entry.score.ToString();
         }
+    }
+
+    [System.Serializable]
+    public class ScoreEntry
+    {
+        public string playerName;
+        public int score;
+    }
+
+    [System.Serializable]
+    public class ScoreEntryList
+    {
+        public List<ScoreEntry> scores;
     }
 }

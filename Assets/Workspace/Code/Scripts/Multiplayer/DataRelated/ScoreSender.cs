@@ -1,18 +1,10 @@
-using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
 using System.Collections;
-
-public class ScoreSender : MonoBehaviour
+static class ScoreSender
 {
-    
-    public void SendScore(int score)
-    {
-        StartCoroutine(SendScoreCoroutine(PlayerData.PlayerName, score));
-    }
-    
-    private IEnumerator SendScoreCoroutine(string playerName, int score)
+    public static IEnumerator SendScoreCoroutine(string playerName, int score)
     {
         ScoreData data = new ScoreData(playerName, score);
         string jsonData = JsonUtility.ToJson(data);    

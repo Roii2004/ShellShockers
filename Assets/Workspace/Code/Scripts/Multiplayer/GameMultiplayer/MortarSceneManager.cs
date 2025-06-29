@@ -32,4 +32,13 @@ public class MortarSceneManager : MonoBehaviour
             Debug.Log("Entered the temple. Let the gains begin.");
         }
     }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            int finalScore = 500; // Replace with actual game score logic later
+            Debug.Log("P key pressed: sending score to server...");
+            StartCoroutine(ScoreSender.SendScoreCoroutine(PlayerData.PlayerName, finalScore));
+        }
+    }
 }
