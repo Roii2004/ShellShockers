@@ -13,6 +13,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     [Header("Button UI References")]
     public Button confirmNameButton;
     public Button createRoomButton;
+    public Button returnToRoomListButton;
 
     [Header("Input Fields UI References")]
     public TMP_InputField playerNameInput;
@@ -22,7 +23,6 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     public Transform UIListContainer;
     public GameObject roomListItemPrefab;
     public GameObject scoreboardItemPrefab; 
-    public GameObject scrollViewGO;
 
     [Header("UI Manager List")]
     public List<GameObject> preNameUIObjects;
@@ -36,6 +36,8 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         createRoomButton.interactable = false;
         createRoomButton.onClick.AddListener(CreateRoom);
         confirmNameButton.onClick.AddListener(ConfirmPlayerName);
+        returnToRoomListButton.gameObject.SetActive(false);
+        returnToRoomListButton.onClick.AddListener(OnReturnToRoomListClicked);
         
         foreach (var go in preNameUIObjects) go.SetActive(true);
         foreach (var go in postNameUIObjects) go.SetActive(false);
@@ -50,6 +52,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Joined Lobby.");
         // Now user manually clicks "Create Room"
+        createRoomButton.interactable = true;
     }
 
     private void ConfirmPlayerName()
@@ -75,6 +78,12 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
 
     public void CreateRoom()
     {
+        if (!PhotonNetwork.IsConnectedAndReady)
+        {
+            Debug.LogError("Photon not ready. Wait for OnConnectedToMaster.");
+            return;
+        }
+
         if (string.IsNullOrEmpty(confirmedPlayerName))
         {
             Debug.LogWarning("Player name not set.");
@@ -125,6 +134,21 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         }
 
         StartCoroutine(FetchAndDisplayScores());
+        returnToRoomListButton.gameObject.SetActive(true);
+    }
+
+    private void OnReturnToRoomListClicked()
+    {
+        returnToRoomListButton.gameObject.SetActive(false);
+
+        // Clear current UI
+        foreach (Transform child in UIListContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Trigger room list refresh manually
+        PhotonNetwork.JoinLobby();
     }
 
     private IEnumerator FetchAndDisplayScores()

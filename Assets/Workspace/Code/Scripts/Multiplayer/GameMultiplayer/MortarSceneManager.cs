@@ -36,7 +36,7 @@ public class MortarSceneManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            int finalScore = 500; // Replace with actual game score logic later
+            int finalScore = 300; // Replace with actual game score logic later
             Debug.Log("P key pressed: sending score to server...");
             StartCoroutine(ScoreSender.SendScoreCoroutine(PlayerData.PlayerName, finalScore));
         }

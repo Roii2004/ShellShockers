@@ -42,7 +42,7 @@ public class CameraManager : MonoBehaviour
         {
             FollowProjectile(toFollowProjectile.transform);
         }
-
+        
         if (Input.GetKeyUp(KeyCode.F))
         {
             StopFollowProjectile();
@@ -51,6 +51,7 @@ public class CameraManager : MonoBehaviour
 
     private void FollowProjectile(Transform projectile)
     {
+        Debug.Log("Following projectile");
         projectileCam.Follow = projectile;
         projectileCam.LookAt = projectile;
 

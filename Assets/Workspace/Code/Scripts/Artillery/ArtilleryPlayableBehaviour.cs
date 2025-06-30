@@ -77,7 +77,7 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
                 if (rb != null)
                 {
                     Fire(rb);
-                    
+                    GetCurrentProjectile?.Invoke(shell);
                     Debug.Log("Shell launched!");
                 }
                 else
