@@ -10,6 +10,13 @@ using UnityEngine.Networking;
 
 public class MultiplayerManager : MonoBehaviourPunCallbacks
 {
+    /*Generally manages the UI, room creation/setting with Photon.Pun and
+     JSON (GET scoreboards and POST name)
+    */
+    
+    [Header("Button UI References")]
+    public SO_ServerData serverData;
+    
     [Header("Button UI References")]
     public Button confirmNameButton;
     public Button createRoomButton;
@@ -153,7 +160,8 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
 
     private IEnumerator FetchAndDisplayScores()
     {
-        UnityWebRequest request = UnityWebRequest.Get("http://localhost:3000/topscores");
+        print(serverData.BaseURL+serverData.topScores);
+        UnityWebRequest request = UnityWebRequest.Get(serverData.BaseURL+serverData.topScores);
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
@@ -176,6 +184,8 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         }
     }
 
+    
+    //Serializable so that is readable by JSON
     [System.Serializable]
     public class ScoreEntry
     {

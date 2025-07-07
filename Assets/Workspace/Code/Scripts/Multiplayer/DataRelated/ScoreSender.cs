@@ -9,7 +9,9 @@ static class ScoreSender
         ScoreData data = new ScoreData(playerName, score);
         string jsonData = JsonUtility.ToJson(data);    
         
-        UnityWebRequest request = new UnityWebRequest("http://localhost:3000/addscore", "POST");
+        //String error prone, ServerData must be in Resources folder
+        SO_ServerData serverData = Resources.Load<SO_ServerData>("ServerData");
+        UnityWebRequest request = new UnityWebRequest(serverData.BaseURL + serverData.addScore, "POST");
         
         System.Text.UTF8Encoding encodingData = new System.Text.UTF8Encoding();
         byte[] bodyRaw = encodingData.GetBytes(jsonData);
