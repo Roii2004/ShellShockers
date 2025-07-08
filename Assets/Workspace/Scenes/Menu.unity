@@ -876,19 +876,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 241372526}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 318649842}
-        m_TargetAssemblyTypeName: MultiplayerManager, Assembly-CSharp
-        m_MethodName: OnSeeScoreboardClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &241372526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -972,18 +960,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serverData: {fileID: 11400000, guid: ef0557eb1e2bb49a7b41ccf5c0c93847, type: 2}
-  confirmNameButton: {fileID: 1808658374}
-  createRoomButton: {fileID: 21813662}
-  returnToRoomListButton: {fileID: 1046199623}
-  playerNameInput: {fileID: 812900402}
-  roomNameInput: {fileID: 929633966}
-  UIListContainer: {fileID: 977566355}
-  roomListItemPrefab: {fileID: 5074788742718209763, guid: e18cd520daca44681a59d3acb771638a, type: 3}
-  scoreboardItemPrefab: {fileID: 5074788742718209763, guid: b9fd4c298428a4dbfb8ed1f9e4b04e01, type: 3}
-  preNameUIObjects:
-  - {fileID: 67548344}
-  postNameUIObjects:
-  - {fileID: 1434052904}
 --- !u!1 &421378633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2228,19 +2204,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1046199624}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 318649840}
-        m_TargetAssemblyTypeName: MultiplayerManager, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1046199624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3099,6 +3063,64 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1556022975
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1556022976}
+  - component: {fileID: 1556022977}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1556022976
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556022975}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2095930006}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1556022977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556022975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 929829756f079423087b397d740a95b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverData: {fileID: 11400000, guid: ef0557eb1e2bb49a7b41ccf5c0c93847, type: 2}
+  confirmNameButton: {fileID: 1808658374}
+  createRoomButton: {fileID: 21813662}
+  returnToRoomListButton: {fileID: 1046199623}
+  seeScoreboardButton: {fileID: 241372525}
+  playerNameInput: {fileID: 812900402}
+  roomNameInput: {fileID: 929633966}
+  UIListContainer: {fileID: 977566355}
+  roomListItemPrefab: {fileID: 5074788742718209763, guid: e18cd520daca44681a59d3acb771638a, type: 3}
+  scoreboardItemPrefab: {fileID: 5074788742718209763, guid: b9fd4c298428a4dbfb8ed1f9e4b04e01, type: 3}
+  preNameUIObjects:
+  - {fileID: 67548344}
+  postNameUIObjects:
+  - {fileID: 1434052904}
 --- !u!1 &1700906291
 GameObject:
   m_ObjectHideFlags: 0
@@ -3501,6 +3523,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 318649841}
+  - {fileID: 1556022976}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2144261044

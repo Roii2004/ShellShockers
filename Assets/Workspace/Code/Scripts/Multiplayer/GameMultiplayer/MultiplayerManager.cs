@@ -4,78 +4,87 @@ using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class MultiplayerManager : MonoBehaviourPunCallbacks
 {
-    /*Generally manages the UI, room creation/setting with Photon.Pun and
-     JSON (GET scoreboards and POST name)
-    */
-    
-    [Header("Button UI References")]
+    // These events will notify UIManager when networking events occur
+    public static Action<string> NameConfirmed;
+    public static Action LobbyJoined;
+    public static Action RoomJoined;
+    public static Action<List<RoomInfo>> RoomListUpdated;
+
     public SO_ServerData serverData;
-    
-    [Header("Button UI References")]
-    public Button confirmNameButton;
-    public Button createRoomButton;
-    public Button returnToRoomListButton;
 
-    [Header("Input Fields UI References")]
-    public TMP_InputField playerNameInput;
-    public TMP_InputField roomNameInput;
-
-    [Header("UI Other References")]
-    public Transform UIListContainer;
-    public GameObject roomListItemPrefab;
-    public GameObject scoreboardItemPrefab; 
-
-    [Header("UI Manager List")]
-    public List<GameObject> preNameUIObjects;
-    public List<GameObject> postNameUIObjects;
-    
     private string confirmedPlayerName = "";
+
+    new void OnEnable()
+    {
+        // Listen for UIManager telling us to join the lobby
+        UIManager.JoinLobbyRequested += HandleJoinLobbyRequested;
+    }
+
+    new void OnDisable()
+    {
+        UIManager.JoinLobbyRequested -= HandleJoinLobbyRequested;
+    }
 
     void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
-        createRoomButton.interactable = false;
-        createRoomButton.onClick.AddListener(CreateRoom);
-        confirmNameButton.onClick.AddListener(ConfirmPlayerName);
-        returnToRoomListButton.gameObject.SetActive(false);
-        returnToRoomListButton.onClick.AddListener(OnReturnToRoomListClicked);
-        
-        foreach (var go in preNameUIObjects) go.SetActive(true);
-        foreach (var go in postNameUIObjects) go.SetActive(false);
     }
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby();
+        Debug.Log("Connected to Photon Master.");
+        // Optional: you could auto-join lobby here if desired
+    }
+
+    // Called when UIManager requests to join the Photon lobby
+    private void HandleJoinLobbyRequested()
+    {
+        if (PhotonNetwork.IsConnectedAndReady)
+        {
+            PhotonNetwork.JoinLobby();
+        }
+        else
+        {
+            Debug.LogWarning("Cannot join lobby, not connected to Photon.");
+        }
     }
 
     public override void OnJoinedLobby()
     {
-        Debug.Log("Joined Lobby.");
-        // Now user manually clicks "Create Room"
-        createRoomButton.interactable = true;
+        Debug.Log("Lobby joined.");
+
+        // Inform UIManager that we've joined the lobby so it can update UI
+        LobbyJoined?.Invoke();
     }
 
-    private void ConfirmPlayerName()
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        if (!string.IsNullOrEmpty(playerNameInput.text))
-        {
-            confirmedPlayerName = playerNameInput.text;
-            PlayerData.PlayerName = confirmedPlayerName;
-            Debug.Log(PlayerData.PlayerName);
-            createRoomButton.interactable = true;
-            Debug.Log("Player name confirmed: " + confirmedPlayerName);
+        // Send the updated room list to UIManager so it can display it
+        RoomListUpdated?.Invoke(roomList);
+    }
 
-            // Hide all objects in the pre-name UI group
-            foreach (var go in preNameUIObjects) go.SetActive(false);
-            // Show all objects in the post-name UI group
-            foreach (var go in postNameUIObjects) go.SetActive(true);
+    public override void OnJoinedRoom()
+    {
+        // Notify UIManager or others that a room was successfully joined
+        RoomJoined?.Invoke();
+
+        // Load the actual multiplayer scene
+        PhotonNetwork.LoadLevel("MortarScene");
+    }
+
+    public void ConfirmPlayerName(string playerName)
+    {
+        if (!string.IsNullOrEmpty(playerName))
+        {
+            confirmedPlayerName = playerName;
+            PlayerData.PlayerName = confirmedPlayerName;
+
+            // Inform UIManager that the name has been confirmed
+            NameConfirmed?.Invoke(confirmedPlayerName);
         }
         else
         {
@@ -83,7 +92,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void CreateRoom()
+    public void CreateRoom(string roomNameInput)
     {
         if (!PhotonNetwork.IsConnectedAndReady)
         {
@@ -97,7 +106,9 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        string roomName = string.IsNullOrEmpty(roomNameInput.text) ? "Room_" + UnityEngine.Random.Range(1000, 9999) : roomNameInput.text;
+        string roomName = string.IsNullOrEmpty(roomNameInput)
+            ? "Room_" + UnityEngine.Random.Range(1000, 9999)
+            : roomNameInput;
 
         PhotonNetwork.CreateRoom(roomName, new RoomOptions
         {
@@ -107,85 +118,23 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         });
     }
 
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    public IEnumerator FetchScores(Action<List<ScoreEntry>> onScoresFetched)
     {
-        // Clear old UI
-        foreach (Transform child in UIListContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Populate list
-        foreach (RoomInfo room in roomList)
-        {
-            if (room.RemovedFromList || !room.IsOpen || !room.IsVisible)
-                continue;
-
-            GameObject item = Instantiate(roomListItemPrefab, UIListContainer);
-            var ui = item.GetComponent<RoomListItemUI>();
-            ui.SetRoomInfo(room);
-            ui.SetJoinAction(() => PhotonNetwork.JoinRoom(room.Name));
-        }
-    }
-
-    public override void OnJoinedRoom()
-    {
-        PhotonNetwork.LoadLevel("MortarScene");
-    }
-
-    public void OnSeeScoreboardClicked()
-    {
-        foreach (Transform child in UIListContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        StartCoroutine(FetchAndDisplayScores());
-        returnToRoomListButton.gameObject.SetActive(true);
-    }
-
-    private void OnReturnToRoomListClicked()
-    {
-        returnToRoomListButton.gameObject.SetActive(false);
-
-        // Clear current UI
-        foreach (Transform child in UIListContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Trigger room list refresh manually
-        PhotonNetwork.JoinLobby();
-    }
-
-    private IEnumerator FetchAndDisplayScores()
-    {
-        print(serverData.BaseURL+serverData.topScores);
-        UnityWebRequest request = UnityWebRequest.Get(serverData.BaseURL+serverData.topScores);
+        UnityWebRequest request = UnityWebRequest.Get(serverData.BaseURL + serverData.topScores);
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError("Failed to fetch scores: " + request.error);
+            onScoresFetched?.Invoke(null);
             yield break;
         }
 
         string wrappedJson = "{\"scores\":" + request.downloadHandler.text + "}";
-        
-        //function takes a JSON string and parses it into an object of type ScoreEntryList .
         ScoreEntryList scoreList = JsonUtility.FromJson<ScoreEntryList>(wrappedJson);
-
-        foreach (ScoreEntry entry in scoreList.scores)
-        {
-            GameObject row = Instantiate(scoreboardItemPrefab, UIListContainer);
-            PlayerNameScoreButtonUI ui = row.GetComponent<PlayerNameScoreButtonUI>();
-            ui.playerNameText.text = entry.playerName;
-            ui.playerScoreText.text = entry.score.ToString();
-        }
+        onScoresFetched?.Invoke(scoreList.scores);
     }
 
-    
-    //Serializable so that is readable by JSON
     [System.Serializable]
     public class ScoreEntry
     {
