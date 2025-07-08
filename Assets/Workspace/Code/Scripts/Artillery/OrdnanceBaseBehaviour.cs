@@ -17,7 +17,7 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     private PhotonView _photonView;
     private bool _hasExploded = false;
 
-    void Start()
+    void Start() 
     {
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
@@ -131,7 +131,6 @@ public class OrdnanceBaseBehaviour : MonoBehaviour
     public void OnExplodeVFX(Vector3 impactPosition)
     {
         Instantiate(projectileSettings.onImpactEffect, impactPosition , Quaternion.identity);
-
     }
     private void OnTriggerEnter(Collider other)
     {
