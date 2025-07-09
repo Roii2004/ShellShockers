@@ -12,6 +12,8 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
     public float maxSimTime = 5f;  // Max time to simulate
     
     public static Action<GameObject> GetCurrentProjectile;
+    public event Action<float, float> OnPivotRotated;
+    
     private PhotonView _photonView;
     protected override void Start()
     {
@@ -27,11 +29,22 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
     {
         base.Update();
 
-        
         if (_photonView.IsMine)
         {
             PlayerInput();
         }
+    }
+    
+    protected override void PivotRotation(float horizontalInput, float verticalInput)
+    {
+        base.PivotRotation(horizontalInput, verticalInput);
+
+        float horizontalAngle = NormalizeAngle(horizontalPivotPoint.localEulerAngles.y);
+        float verticalAngle = NormalizeAngle(verticalPivotPoint.localEulerAngles.x);
+
+        print(horizontalAngle);
+        print(verticalAngle);
+        OnPivotRotated?.Invoke(horizontalAngle, verticalAngle);
     }
 
     private void PlayerInput()
@@ -56,7 +69,6 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
                 trajectoryLine.positionCount = 0;
         }
     }
-    
     protected virtual void TryFire()
     {
         if (timeSinceLastShot >= fireCooldown)
@@ -95,7 +107,6 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
             Debug.Log("Still reloading...");
         }
     }
-    
     protected void DrawTrajectory()
     {
         if (!trajectoryLine || !firePoint) return;
@@ -127,8 +138,6 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
         trajectoryLine.positionCount = points.Count;
         trajectoryLine.SetPositions(points.ToArray());
     }
-    
-    
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -142,7 +151,6 @@ public class ArtilleryPlayableBehaviour : ArtilleryBaseBehaviour, IPunObservable
             verticalPivotPoint.localEulerAngles = verticalRotation;
         }
     }
-
     public override void Fire(Rigidbody rb)
     {
         //Fire is different in base, playable and AI mortar

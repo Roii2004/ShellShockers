@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class MultiplayerManager : MonoBehaviourPunCallbacks
 {
-    // These events will notify UIManager when networking events occur
     public static Action<string> NameConfirmed;
     public static Action LobbyJoined;
     public static Action RoomJoined;
@@ -18,33 +15,41 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
 
     private string confirmedPlayerName = "";
 
-    new void OnEnable()
+    private void OnEnable()
     {
-        // Listen for UIManager telling us to join the lobby
         UIManager.JoinLobbyRequested += HandleJoinLobbyRequested;
     }
-
-    new void OnDisable()
+    
+    private void OnDisable()
     {
         UIManager.JoinLobbyRequested -= HandleJoinLobbyRequested;
     }
 
-    void Start()
+    private void OnDestroy()
     {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+    
+    private void Start()
+    {
+        Debug.Log("Start() called, attempting to connect to Photon...");
+        PhotonNetwork.AddCallbackTarget(this);
         PhotonNetwork.ConnectUsingSettings();
     }
-
+    
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Connected to Photon Master.");
-        // Optional: you could auto-join lobby here if desired
+        Debug.Log("Connected to Photon Master Server");
+
+        // Automatically join the default lobby
+        PhotonNetwork.JoinLobby();
     }
 
-    // Called when UIManager requests to join the Photon lobby
     private void HandleJoinLobbyRequested()
     {
         if (PhotonNetwork.IsConnectedAndReady)
         {
+            Debug.Log("Joining Lobby");
             PhotonNetwork.JoinLobby();
         }
         else
@@ -57,22 +62,18 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Lobby joined.");
 
-        // Inform UIManager that we've joined the lobby so it can update UI
         LobbyJoined?.Invoke();
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        // Send the updated room list to UIManager so it can display it
         RoomListUpdated?.Invoke(roomList);
     }
 
     public override void OnJoinedRoom()
     {
-        // Notify UIManager or others that a room was successfully joined
         RoomJoined?.Invoke();
 
-        // Load the actual multiplayer scene
         PhotonNetwork.LoadLevel("MortarScene");
     }
 
@@ -96,7 +97,13 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     {
         if (!PhotonNetwork.IsConnectedAndReady)
         {
-            Debug.LogError("Photon not ready. Wait for OnConnectedToMaster.");
+            Debug.LogError("Cannot create room: Photon is not connected and ready.");
+            return;
+        }
+
+        if (!PhotonNetwork.InLobby)
+        {
+            Debug.LogError("Cannot create room: client has not joined the lobby yet.");
             return;
         }
 
@@ -117,8 +124,11 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             IsOpen = true
         });
     }
-
-    public IEnumerator FetchScores(Action<List<ScoreEntry>> onScoresFetched)
+    private void Update()
+    {
+        Debug.Log("Photon state: " + PhotonNetwork.NetworkClientState);
+    }
+    /*public IEnumerator FetchScores(Action<List<ScoreEntry>> onScoresFetched)
     {
         UnityWebRequest request = UnityWebRequest.Get(serverData.BaseURL + serverData.topScores);
         yield return request.SendWebRequest();
@@ -133,7 +143,7 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
         string wrappedJson = "{\"scores\":" + request.downloadHandler.text + "}";
         ScoreEntryList scoreList = JsonUtility.FromJson<ScoreEntryList>(wrappedJson);
         onScoresFetched?.Invoke(scoreList.scores);
-    }
+    }*/
 
     [System.Serializable]
     public class ScoreEntry

@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
-    // Used to tell MultiplayerManager: "Hey, the player clicked join lobby"
+    // Used to reload scoreboards 
     public static Action JoinLobbyRequested;
 
     [Header("Server Info")]
@@ -46,14 +46,12 @@ public class UIManager : MonoBehaviour
     {
         // Listen to events sent from MultiplayerManager
         MultiplayerManager.NameConfirmed += HandleNameConfirmed;
-        MultiplayerManager.LobbyJoined += HandleLobbyJoined;
         MultiplayerManager.RoomListUpdated += UpdateRoomList;
     }
 
     private void OnDisable()
     {
         MultiplayerManager.NameConfirmed -= HandleNameConfirmed;
-        MultiplayerManager.LobbyJoined -= HandleLobbyJoined;
         MultiplayerManager.RoomListUpdated -= UpdateRoomList;
     }
 
@@ -92,12 +90,6 @@ public class UIManager : MonoBehaviour
         foreach (var go in postNameUIObjects) go.SetActive(true);
     }
 
-    public void HandleLobbyJoined()
-    {
-        // Called when MultiplayerManager confirms we joined the lobby
-        createRoomButton.interactable = true;
-    }
-
     public void OnSeeScoreboardClicked()
     {
         foreach (Transform child in UIListContainer)
@@ -118,7 +110,6 @@ public class UIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // 🔄 Tell MultiplayerManager: "The player wants to join the lobby again"
         JoinLobbyRequested?.Invoke();
     }
 

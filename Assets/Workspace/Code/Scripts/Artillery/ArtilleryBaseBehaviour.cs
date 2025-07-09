@@ -30,7 +30,7 @@ public abstract class ArtilleryBaseBehaviour : MonoBehaviourPun
         timeSinceLastShot += Time.deltaTime;
     }
 
-    protected void PivotRotation(float horizontalInput, float verticalInput)
+    protected virtual void PivotRotation(float horizontalInput, float verticalInput)
     {
         // Vertical tilt (elevation)
         float currentX = verticalPivotPoint.localEulerAngles.x;
