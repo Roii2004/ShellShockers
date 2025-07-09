@@ -19,32 +19,25 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
     {
         UIManager.JoinLobbyRequested += HandleJoinLobbyRequested;
     }
-    
     private void OnDisable()
     {
         UIManager.JoinLobbyRequested -= HandleJoinLobbyRequested;
     }
-
     private void OnDestroy()
     {
         PhotonNetwork.RemoveCallbackTarget(this);
     }
-    
     private void Start()
     {
-        Debug.Log("Start() called, attempting to connect to Photon...");
         PhotonNetwork.AddCallbackTarget(this);
         PhotonNetwork.ConnectUsingSettings();
     }
-    
     public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to Photon Master Server");
 
-        // Automatically join the default lobby
         PhotonNetwork.JoinLobby();
     }
-
     private void HandleJoinLobbyRequested()
     {
         if (PhotonNetwork.IsConnectedAndReady)
@@ -57,26 +50,22 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("Cannot join lobby, not connected to Photon.");
         }
     }
-
     public override void OnJoinedLobby()
     {
         Debug.Log("Lobby joined.");
 
         LobbyJoined?.Invoke();
     }
-
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         RoomListUpdated?.Invoke(roomList);
     }
-
     public override void OnJoinedRoom()
     {
         RoomJoined?.Invoke();
 
         PhotonNetwork.LoadLevel("MortarScene");
     }
-
     public void ConfirmPlayerName(string playerName)
     {
         if (!string.IsNullOrEmpty(playerName))
@@ -92,7 +81,6 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("Player name cannot be empty.");
         }
     }
-
     public void CreateRoom(string roomNameInput)
     {
         if (!PhotonNetwork.IsConnectedAndReady)

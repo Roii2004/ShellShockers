@@ -57,19 +57,16 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        // When player clicks "Confirm Name", tell MultiplayerManager
         confirmNameButton.onClick.AddListener(() =>
         {
             FindObjectOfType<MultiplayerManager>().ConfirmPlayerName(playerNameInput.text);
         });
 
-        // When player clicks "Create Room", tell MultiplayerManager
         createRoomButton.onClick.AddListener(() =>
         {
             FindObjectOfType<MultiplayerManager>().CreateRoom(roomNameInput.text);
         });
 
-        // When returning from scoreboard to room list
         returnToRoomListButton.onClick.AddListener(HandleReturnToRoomListClicked);
         returnToRoomListButton.gameObject.SetActive(false);
 
@@ -78,10 +75,8 @@ public class UIManager : MonoBehaviour
         foreach (var go in preNameUIObjects) go.SetActive(true);
         foreach (var go in postNameUIObjects) go.SetActive(false);
     }
-
     public void HandleNameConfirmed(string playerName)
     {
-        // You can optionally use 'playerName' here to update the UI or log it
         Debug.Log($"Name confirmed: {playerName}");
 
         createRoomButton.interactable = true;
@@ -89,7 +84,6 @@ public class UIManager : MonoBehaviour
         foreach (var go in preNameUIObjects) go.SetActive(false);
         foreach (var go in postNameUIObjects) go.SetActive(true);
     }
-
     public void OnSeeScoreboardClicked()
     {
         foreach (Transform child in UIListContainer)
@@ -100,7 +94,6 @@ public class UIManager : MonoBehaviour
         StartCoroutine(FetchAndDisplayScores());
         returnToRoomListButton.gameObject.SetActive(true);
     }
-
     private void HandleReturnToRoomListClicked()
     {
         returnToRoomListButton.gameObject.SetActive(false);
@@ -112,7 +105,6 @@ public class UIManager : MonoBehaviour
 
         JoinLobbyRequested?.Invoke();
     }
-
     private IEnumerator FetchAndDisplayScores()
     {
         string url = serverData.BaseURL + serverData.topScores;
@@ -136,7 +128,6 @@ public class UIManager : MonoBehaviour
             ui.playerScoreText.text = entry.score.ToString();
         }
     }
-
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
         foreach (Transform child in UIListContainer)
