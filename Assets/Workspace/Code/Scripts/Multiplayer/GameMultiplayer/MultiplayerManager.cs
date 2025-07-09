@@ -124,37 +124,4 @@ public class MultiplayerManager : MonoBehaviourPunCallbacks
             IsOpen = true
         });
     }
-    private void Update()
-    {
-        Debug.Log("Photon state: " + PhotonNetwork.NetworkClientState);
-    }
-    /*public IEnumerator FetchScores(Action<List<ScoreEntry>> onScoresFetched)
-    {
-        UnityWebRequest request = UnityWebRequest.Get(serverData.BaseURL + serverData.topScores);
-        yield return request.SendWebRequest();
-
-        if (request.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError("Failed to fetch scores: " + request.error);
-            onScoresFetched?.Invoke(null);
-            yield break;
-        }
-
-        string wrappedJson = "{\"scores\":" + request.downloadHandler.text + "}";
-        ScoreEntryList scoreList = JsonUtility.FromJson<ScoreEntryList>(wrappedJson);
-        onScoresFetched?.Invoke(scoreList.scores);
-    }*/
-
-    [System.Serializable]
-    public class ScoreEntry
-    {
-        public string playerName;
-        public int score;
-    }
-
-    [System.Serializable]
-    public class ScoreEntryList
-    {
-        public List<ScoreEntry> scores;
-    }
 }
